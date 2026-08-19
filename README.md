@@ -44,38 +44,72 @@ The active runtime deployment loads **148,854 in-memory FAISS vectors** across 3
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Horizontal Swimlane Architecture
 
 ```mermaid
-graph TD
-    A[Spoken Voice Audio / Text Bypass] --> B[Sarvam Saaras v3 STT + ffmpeg 16kHz Normalizer]
-    B --> C[VECTOR Language Resolution Router: config.LANGUAGES]
-    C --> D[VECTOR Guardrail 1: Tier-1 Fast Regex + Safety Patterns]
-    D -- Safe --> PG[VECTOR Guardrail 2: Meta Prompt-Guard 86M Neural DPI Shield]
-    D -- Blocked --> X[Declined Response: Safety Violation]
-    PG -- Safe --> IF[VECTOR Guardrail 3: Pre-Retrieval Query Intent Filter]
-    PG -- Injected --> X
-    IF -- Factual --> E[Query Embedding: 'query: ' Prefix multilingual-e5-small INT8]
-    IF -- Non-Factual Intent --> X
-    E --> F[VECTOR Guardrail 4: Centroid Distance Off-Topic Filter]
-    F -- Off-Topic --> X
-    F -- On-Topic --> CACHE{Dynamic Vector & Gold QA Cache}
-    CACHE -- Cache Hit <0.5ms --> N[Grounded Response + Zero-Latency Fast Path]
-    CACHE -- Cache Miss --> G[VECTOR Parallel Multi-Strategy FAISS HNSW Engine]
-    G --> H1[Passage Native Index: 148,545 Vectors]
-    G --> H2[Semantic LongDoc Index: 309 Vectors]
-    H1 --> I[Candidate Merge & Reciprocal Rank Fusion RRF k=60]
-    H2 --> I
-    I --> J[VECTOR Adaptive Script-Aware BM25 Score Fusion]
-    J --> K[Relevance & Disqualification Gate: Dense / CE Threshold]
-    K -- Score < Threshold --> Y[Declined Response: No Relevant Info in Corpus]
-    K -- High Relevance --> CS[Context Chunk Safety: Batched Prompt-Guard 86M IPI Scan]
-    CS -- Poisoned Chunks --> X
-    CS -- Clean Chunks --> L[VECTOR Deterministic Context Synthesis: TextRank + SVD Energy]
-    L --> M[VECTOR Post-Generation Grounding & Hallucination Guardrail]
-    M -- Grounded --> N[Grounded JSON Response + Full 9-Stage Telemetry]
-    M -- Insufficient Info --> Y
+graph LR
+    %% Custom Styling Classes
+    classDef inputStyle fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC;
+    classDef sttStyle fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC;
+    classDef guardStyle fill:#311B92,stroke:#B388FF,stroke-width:2px,color:#FFFFFF;
+    classDef cacheStyle fill:#064E3B,stroke:#34D399,stroke-width:2px,color:#F8FAFC;
+    classDef faissStyle fill:#164E63,stroke:#22D3EE,stroke-width:2px,color:#F8FAFC;
+    classDef synthStyle fill:#4C1D95,stroke:#C084FC,stroke-width:2px,color:#F8FAFC;
+    classDef outStyle fill:#065F46,stroke:#10B981,stroke-width:2px,color:#FFFFFF;
+    classDef blockStyle fill:#881337,stroke:#F43F5E,stroke-width:2px,color:#FFFFFF;
+
+    subgraph PATH1 ["🎙️ Path 1: Audio & Text Ingestion"]
+        A[Audio Upload / Microphone Stream] ::: inputStyle --> STT[Sarvam Saaras STT + ffmpeg 16kHz] ::: sttStyle
+        T[Raw Text Input Bypass] ::: inputStyle --> ROUTER[Language Resolution Router] ::: sttStyle
+        STT --> ROUTER
+    end
+
+    subgraph PATH2 ["🛡️ Path 2: 4-Tier Security Shield"]
+        ROUTER --> G1[Tier-1 Stem Regex + Obfuscation Decoder] ::: guardStyle
+        G1 -- Safe --> G2[Tier-2 Meta Prompt-Guard 86M DPI] ::: guardStyle
+        G2 -- Safe --> G3[Tier-3 6-Class Query Intent Gate] ::: guardStyle
+        G3 -- Factual --> G4[Tier-4 Own-Lang Centroid Distance Gate] ::: guardStyle
+    end
+
+    subgraph PATH3 ["⚡ Path 3: Sub-0.5ms Hot Cache Fast-Path"]
+        G4 -- On-Topic --> CACHE{Hot Cache Lookup} ::: cacheStyle
+        CACHE -- "Hit (<0.5ms)" --> FAST_OUT[Zero-Latency Response] ::: outStyle
+    end
+
+    subgraph PATH4 ["🔎 Path 4: Hybrid Vector Retrieval Engine"]
+        CACHE -- "Miss" --> EMB[multilingual-e5-small INT8 ONNX] ::: faissStyle
+        EMB --> FAISS[Parallel FAISS HNSW Native & LongDoc Search] ::: faissStyle
+        FAISS --> RRF[Reciprocal Rank Fusion k=60] ::: faissStyle
+        RRF --> BM25[Adaptive Script-Aware BM25 Fusion] ::: faissStyle
+        BM25 --> GATE{Disqualification Gate} ::: faissStyle
+    end
+
+    subgraph PATH5 ["🧠 Path 5: Deterministic Synthesis & Grounding"]
+        GATE -- High Relevance --> IPI[Batched Prompt-Guard IPI Context Scan] ::: synthStyle
+        IPI -- Clean Chunks --> SYNTH[Continuous TextRank + SVD Energy Synthesis] ::: synthStyle
+        SYNTH --> GROUND[Post-Gen Grounding Overlap Verifier] ::: synthStyle
+        GROUND -- Grounded --> FINAL_OUT[JSON Response + 9-Stage Telemetry] ::: outStyle
+    end
+
+    %% Rejection Routing
+    G1 -- Blocked --> REJECT[Declined Response: Safety Violation] ::: blockStyle
+    G2 -- Injected --> REJECT
+    G3 -- Non-Factual --> REJECT
+    G4 -- Off-Topic --> REJECT
+    GATE -- Score < 0.35 --> DECLINE[Declined Response: Insufficient Info] ::: blockStyle
+    IPI -- Poisoned --> REJECT
+    GROUND -- Ungrounded --> DECLINE
 ```
+
+### 🛣️ Swimlane Pipeline Execution Breakdown
+
+| Swimlane / Path | Key Components & Models | Latency Budget | Action on Failure / Edge Case |
+| :--- | :--- | :---: | :--- |
+| **🎙️ Path 1: Ingestion & STT** | Sarvam Saaras `saaras:v3` + `ffmpeg` 16kHz mono normalizer | `< 150 ms` (Audio) / `< 0.1 ms` (Text) | Fallback to default `language_hint` or auto-detect |
+| **🛡️ Path 2: 4-Tier Security Shield** | Tier-1 Regex Stem Gap=4, Tier-2 Prompt-Guard 86M ONNX, Tier-3 6-Class Intent, Tier-4 Centroid Distance | `< 2.5 ms` | Fail-Safe-by-Category (`model_failed=True`), block immediately |
+| **⚡ Path 3: Cache Fast-Path** | Gold QA Pairs + Dynamic In-Memory Vector LRU Cache ($N=2048$) | **`< 0.5 ms`** | Fallback to full retrieval pipeline on cache miss |
+| **🔎 Path 4: Hybrid Search Engine** | `multilingual-e5-small` INT8 ONNX + FAISS HNSW ($M=32$) + RRF ($k=60$) + Script-Aware BM25 | **`< 8.0 ms`** | Candidate disqualification gate if composite score $< 0.35$ |
+| **🧠 Path 5: Synthesis & Grounding** | Batched IPI Prompt-Guard + Continuous TextRank + SVD Singular Energy + Token Overlap | **`< 10.0 ms`** | Return standard non-hallucinating template on grounding fail |
 
 ---
 
