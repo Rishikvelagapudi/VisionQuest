@@ -48,6 +48,48 @@ The active runtime deployment loads **148,854 in-memory FAISS vectors** across 3
 
 ```mermaid
 graph LR
+    subgraph PATH1 ["🎙️ Path 1: Audio & Text Ingestion"]
+        A[Audio Upload / Microphone Stream] --> STT[Sarvam Saaras STT + ffmpeg 16kHz]
+        T[Raw Text Input Bypass] --> ROUTER[Language Resolution Router]
+        STT --> ROUTER
+    end
+
+    subgraph PATH2 ["🛡️ Path 2: 4-Tier Security Shield"]
+        ROUTER --> G1[Tier-1 Stem Regex + Obfuscation Decoder]
+        G1 -- Safe --> G2[Tier-2 Meta Prompt-Guard 86M DPI]
+        G2 -- Safe --> G3[Tier-3 6-Class Query Intent Gate]
+        G3 -- Factual --> G4[Tier-4 Own-Lang Centroid Distance Gate]
+    end
+
+    subgraph PATH3 ["⚡ Path 3: Sub-0.5ms Hot Cache Fast-Path"]
+        G4 -- On-Topic --> CACHE{Hot Cache Lookup}
+        CACHE -- "Hit (<0.5ms)" --> FAST_OUT[Zero-Latency Response]
+    end
+
+    subgraph PATH4 ["🔎 Path 4: Hybrid Vector Retrieval Engine"]
+        CACHE -- "Miss" --> EMB[multilingual-e5-small INT8 ONNX]
+        EMB --> FAISS[Parallel FAISS HNSW Native & LongDoc Search]
+        FAISS --> RRF[Reciprocal Rank Fusion k=60]
+        RRF --> BM25[Adaptive Script-Aware BM25 Fusion]
+        BM25 --> GATE{Disqualification Gate}
+    end
+
+    subgraph PATH5 ["🧠 Path 5: Deterministic Synthesis & Grounding"]
+        GATE -- High Relevance --> IPI[Batched Prompt-Guard IPI Context Scan]
+        IPI -- Clean Chunks --> SYNTH[Continuous TextRank + SVD Energy Synthesis]
+        SYNTH --> GROUND[Post-Gen Grounding Overlap Verifier]
+        GROUND -- Grounded --> FINAL_OUT[JSON Response + 9-Stage Telemetry]
+    end
+
+    %% Rejection Routing
+    G1 -- Blocked --> REJECT[Declined Response: Safety Violation]
+    G2 -- Injected --> REJECT
+    G3 -- Non-Factual --> REJECT
+    G4 -- Off-Topic --> REJECT
+    GATE -- Score < 0.35 --> DECLINE[Declined Response: Insufficient Info]
+    IPI -- Poisoned --> REJECT
+    GROUND -- Ungrounded --> DECLINE
+
     %% Custom Styling Classes
     classDef inputStyle fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC;
     classDef sttStyle fill:#0F172A,stroke:#818CF8,stroke-width:2px,color:#F8FAFC;
@@ -58,47 +100,14 @@ graph LR
     classDef outStyle fill:#065F46,stroke:#10B981,stroke-width:2px,color:#FFFFFF;
     classDef blockStyle fill:#881337,stroke:#F43F5E,stroke-width:2px,color:#FFFFFF;
 
-    subgraph PATH1 ["🎙️ Path 1: Audio & Text Ingestion"]
-        A[Audio Upload / Microphone Stream] ::: inputStyle --> STT[Sarvam Saaras STT + ffmpeg 16kHz] ::: sttStyle
-        T[Raw Text Input Bypass] ::: inputStyle --> ROUTER[Language Resolution Router] ::: sttStyle
-        STT --> ROUTER
-    end
-
-    subgraph PATH2 ["🛡️ Path 2: 4-Tier Security Shield"]
-        ROUTER --> G1[Tier-1 Stem Regex + Obfuscation Decoder] ::: guardStyle
-        G1 -- Safe --> G2[Tier-2 Meta Prompt-Guard 86M DPI] ::: guardStyle
-        G2 -- Safe --> G3[Tier-3 6-Class Query Intent Gate] ::: guardStyle
-        G3 -- Factual --> G4[Tier-4 Own-Lang Centroid Distance Gate] ::: guardStyle
-    end
-
-    subgraph PATH3 ["⚡ Path 3: Sub-0.5ms Hot Cache Fast-Path"]
-        G4 -- On-Topic --> CACHE{Hot Cache Lookup} ::: cacheStyle
-        CACHE -- "Hit (<0.5ms)" --> FAST_OUT[Zero-Latency Response] ::: outStyle
-    end
-
-    subgraph PATH4 ["🔎 Path 4: Hybrid Vector Retrieval Engine"]
-        CACHE -- "Miss" --> EMB[multilingual-e5-small INT8 ONNX] ::: faissStyle
-        EMB --> FAISS[Parallel FAISS HNSW Native & LongDoc Search] ::: faissStyle
-        FAISS --> RRF[Reciprocal Rank Fusion k=60] ::: faissStyle
-        RRF --> BM25[Adaptive Script-Aware BM25 Fusion] ::: faissStyle
-        BM25 --> GATE{Disqualification Gate} ::: faissStyle
-    end
-
-    subgraph PATH5 ["🧠 Path 5: Deterministic Synthesis & Grounding"]
-        GATE -- High Relevance --> IPI[Batched Prompt-Guard IPI Context Scan] ::: synthStyle
-        IPI -- Clean Chunks --> SYNTH[Continuous TextRank + SVD Energy Synthesis] ::: synthStyle
-        SYNTH --> GROUND[Post-Gen Grounding Overlap Verifier] ::: synthStyle
-        GROUND -- Grounded --> FINAL_OUT[JSON Response + 9-Stage Telemetry] ::: outStyle
-    end
-
-    %% Rejection Routing
-    G1 -- Blocked --> REJECT[Declined Response: Safety Violation] ::: blockStyle
-    G2 -- Injected --> REJECT
-    G3 -- Non-Factual --> REJECT
-    G4 -- Off-Topic --> REJECT
-    GATE -- Score < 0.35 --> DECLINE[Declined Response: Insufficient Info] ::: blockStyle
-    IPI -- Poisoned --> REJECT
-    GROUND -- Ungrounded --> DECLINE
+    class A,T inputStyle;
+    class STT,ROUTER sttStyle;
+    class G1,G2,G3,G4 guardStyle;
+    class CACHE cacheStyle;
+    class EMB,FAISS,RRF,BM25,GATE faissStyle;
+    class IPI,SYNTH,GROUND synthStyle;
+    class FAST_OUT,FINAL_OUT outStyle;
+    class REJECT,DECLINE blockStyle;
 ```
 
 ### 🛣️ Swimlane Pipeline Execution Breakdown
