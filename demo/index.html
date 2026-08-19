@@ -555,25 +555,20 @@
         <!-- Terminal Container -->
         <div class="comic-panel p-5 flex flex-col items-center justify-center gap-4">
           
-          <!-- Star Shaped Spider Web Mic Radar (Vibrant Spider-Web Theme) -->
-          <div class="relative w-56 h-56 flex items-center justify-center filter drop-shadow-[6px_6px_0px_#000] my-2">
+          <!-- Star Shaped Spider Web Mic Radar (Reference Image Design) -->
+          <div class="relative w-64 h-64 flex items-center justify-center filter drop-shadow-[8px_8px_0px_#000000] my-2">
             <!-- Outer Black Star Border Shell -->
             <div class="absolute inset-0 bg-black clip-star-8 pointer-events-none"></div>
 
-            <!-- Inner Star Container with Blue, Red & Black Web Gradient & Canvas -->
-            <div class="absolute inset-[4px] clip-star-8 bg-gradient-to-br from-black via-cyan-950 to-pink-950 flex items-center justify-center overflow-hidden">
+            <!-- Inner Star Container with Dark Teal Background (#0a1e28) & Canvas -->
+            <div class="absolute inset-[3.5px] clip-star-8 bg-[#0a1e28] flex items-center justify-center overflow-hidden">
               
-              <!-- Background Web Ring Accents (Cyan & Crimson Web Mesh) -->
-              <div class="absolute inset-2 clip-star-8 border-2 border-cyan-400/50 pointer-events-none"></div>
-              <div class="absolute inset-6 clip-star-8 border-2 border-pink-500/50 pointer-events-none"></div>
-              <div class="absolute inset-10 clip-star-8 border-2 border-yellow-400/40 pointer-events-none"></div>
-
               <!-- Animated Interactive Spider Web Waveform Canvas -->
-              <canvas id="waveformCanvas" class="absolute inset-0 w-full h-full opacity-95 pointer-events-none"></canvas>
+              <canvas id="waveformCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
-              <!-- Star-Shaped Record Button (Crimson Red Star & White Mic) -->
-              <button id="recordBtn" class="relative z-10 w-20 h-20 bg-beachpink hover:bg-pink-500 active:scale-95 border-3 border-black flex items-center justify-center shadow-brutal transition cursor-pointer clip-star-5 hover:rotate-12 transition-transform duration-300">
-                <span id="micIcon" class="material-symbols-outlined text-3xl font-black text-white">mic</span>
+              <!-- Star-Shaped Record Button (Hot Pink / Magenta Star with White Mic Icon) -->
+              <button id="recordBtn" class="relative z-10 w-22 h-22 bg-[#ff007f] hover:bg-[#e60073] active:scale-95 border-2.5 border-black flex items-center justify-center filter drop-shadow-[3px_3px_0px_#000000] transition cursor-pointer clip-star-5 hover:rotate-12 transition-transform duration-300">
+                <span id="micIcon" class="material-symbols-outlined text-4xl font-black text-white selection:bg-transparent">mic</span>
               </button>
             </div>
           </div>
@@ -1305,7 +1300,11 @@
       const numSpokes = 8;
       const numRings = 5;
 
-      // 1. Draw Spider Web Radial Spokes (High contrast Cyan & Crimson)
+      // Fill inner background of starburst container with solid dark teal (#0a1e28)
+      ctx.fillStyle = "#0a1e28";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 1. Draw Spider Web Radial Spokes (Alternating Electric Cyan #00e5ff & Hot Pink #ff007f)
       for (let i = 0; i < numSpokes; i++) {
         const angle = (i * Math.PI * 2) / numSpokes - Math.PI / 2;
         const x = cx + Math.cos(angle) * maxR;
@@ -1314,9 +1313,9 @@
         ctx.moveTo(cx, cy);
         ctx.lineTo(x, y);
         ctx.strokeStyle = isRecording 
-          ? "rgba(255, 0, 90, 0.85)" 
-          : (i % 2 === 0 ? "rgba(0, 180, 255, 0.75)" : "rgba(255, 0, 90, 0.75)");
-        ctx.lineWidth = 2.0;
+          ? "#ff007f" 
+          : (i % 2 === 0 ? "#00e5ff" : "#ff007f");
+        ctx.lineWidth = 2.2;
         ctx.stroke();
       }
 
@@ -1327,8 +1326,8 @@
 
         ctx.beginPath();
         ctx.strokeStyle = isRecording
-          ? `rgba(255, 0, 90, ${0.6 + r * 0.08})`
-          : (r % 2 === 0 ? `rgba(0, 180, 255, ${0.5 + r * 0.08})` : `rgba(255, 0, 90, ${0.5 + r * 0.08})`);
+          ? `rgba(255, 0, 127, ${0.7 + r * 0.06})`
+          : (r % 2 === 0 ? `rgba(0, 229, 255, ${0.75 + r * 0.05})` : `rgba(255, 0, 127, ${0.75 + r * 0.05})`);
         ctx.lineWidth = isRecording ? 2.5 : 2.0;
 
         const ringPoints = [];
@@ -1346,10 +1345,6 @@
           const px = cx + Math.cos(angle) * currentR;
           const py = cy + Math.sin(angle) * currentR;
           ringPoints.push({ x: px, y: py, angle: angle });
-
-          if (i === 0) {
-            ctx.moveTo(px, py);
-          }
         }
 
         // Draw curved spider web strands dipping inwards towards center
@@ -1362,22 +1357,23 @@
           const midX = cx + Math.cos(midAngle) * dipRadius;
           const midY = cy + Math.sin(midAngle) * dipRadius;
 
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
           ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+          ctx.stroke();
         }
 
-        ctx.stroke();
-
-        // 3. Draw Spider Web Intersecting Node Dots (Bright Cyan & Red)
+        // 3. Draw Spider Web Intersecting Node Dots (Bright Cyan & Hot Pink with Black Borders)
         for (let idx = 0; idx < ringPoints.length; idx++) {
           const pt = ringPoints[idx];
-          ctx.fillStyle = isRecording ? "#FF0055" : (idx % 2 === 0 ? "#00F0FF" : "#FF0055");
+          ctx.fillStyle = isRecording ? "#ff007f" : (idx % 2 === 0 ? "#00e5ff" : "#ff007f");
           ctx.beginPath();
-          ctx.arc(pt.x, pt.y, isRecording ? 4.0 : 3.2, 0, Math.PI * 2);
+          ctx.arc(pt.x, pt.y, isRecording ? 4.5 : 3.8, 0, Math.PI * 2);
           ctx.fill();
 
-          // Outer node stroke outline
+          // Black node stroke outline matching reference image
           ctx.strokeStyle = "#000000";
-          ctx.lineWidth = 1;
+          ctx.lineWidth = 1.4;
           ctx.stroke();
         }
       }
