@@ -11,8 +11,6 @@
 
 **An instrumented, ultra-low-latency, voice-enabled Retrieval-Augmented Generation (RAG) engine built from scratch for 14 Indic languages + English.**
 
-[Features](#-key-features) • [Architecture](#-system-architecture) • [Language Matrix](#-language-extensibility-matrix) • [Benchmarks](#-benchmark-results) • [Deep-Dive](#-technical-deep-dive--engineering-rationales) • [Quickstart](#-quickstart--local-setup) • [Tests](#-test-suite--verification-5050-passing) • [Structure](#-repository-structure)
-
 </div>
 
 ---
