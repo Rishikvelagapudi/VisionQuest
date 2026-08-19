@@ -1,5 +1,5 @@
 """
-Hacker House Goa 2026 Indic Voice RAG Application Package.
+VECTOR Indic Voice RAG Application Package.
 """
 
 from pathlib import Path

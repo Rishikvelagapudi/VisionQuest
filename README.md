@@ -1,16 +1,16 @@
 ---
-title: Hacker House Goa 2026 - Voice Indic RAG
-emoji: 🌴
+title: VECTOR - Voice Indic RAG
+emoji: ⚡
 colorFrom: green
-colorTo: yellow
+colorTo: blue
 sdk: docker
 app_port: 7860
 pinned: false
 license: mit
-short_description: Voice Indic RAG with Sub-10ms FAISS Retrieval
+short_description: VECTOR Voice Indic RAG with Sub-10ms FAISS Retrieval
 ---
 
-# 🌴 Hacker House Goa 2026: Voice-Enabled Multilingual Indic RAG
+# ⚡ VECTOR: Voice-Enabled Multilingual Indic RAG Engine
 
 <div align="center">
 
@@ -31,7 +31,7 @@ short_description: Voice Indic RAG with Sub-10ms FAISS Retrieval
 
 ## 📌 Executive Summary
 
-Active runtime deployment is optimized for **3 core languages** (**English [`en`]**, **Hindi [`hi`]**, and **Marathi [`mr`]**) loading **148,854 in-memory vectors** (148,545 native passage vectors + 309 semantic longdoc vectors), achieving **~7.04 ms retrieval latency** (p95: 7.97 ms vs 50.0 ms budget). 
+**VECTOR** is optimized for low-latency, voice-enabled Retrieval-Augmented Generation across Indian languages. Active runtime deployment is optimized for **3 core languages** (**English [`en`]**, **Hindi [`hi`]**, and **Marathi [`mr`]**) loading **148,854 in-memory vectors** (148,545 native passage vectors + 309 semantic longdoc vectors), achieving **~7.04 ms retrieval latency** (p95: 7.97 ms vs 50.0 ms budget). 
 
 The system provides zero-code extensibility across **all 14 Indic languages** (*Assamese, Bengali, Gujarati, Hindi, Kannada, Malayalam, Marathi, Nepali, Odia, Punjabi, Sanskrit, Tamil, Telugu, Urdu*) plus **English** (15 languages total, **~743,000 deduplicated passages**) via a single configuration entry (`config.LANGUAGES`).
 
@@ -40,7 +40,7 @@ The system provides zero-code extensibility across **all 14 Indic languages** (*
 - 🛡️ **Cascaded 4-Tier Guardrails**: Stem regex, Meta Prompt-Guard 86M neural DPI/IPI shield, 6-class intent filter, and own-language centroid weighting.
 - 🔀 **Script-Aware BM25 + Dense Fusion**: Automatic cross-script detection bypassing BM25 penalties for cross-lingual queries.
 - 🧮 **Deterministic Synthesis**: TextRank graph centrality + SVD singular energy context ranking (zero LLM API latency or cost).
-- 🌴 **Command Center UI**: Retro-tropical Web Audio waveform interface with stage-by-stage telemetry waterfall.
+- 🌴 **VECTOR Command Center UI**: Retro-tropical Web Audio waveform interface with stage-by-stage telemetry waterfall.
 
 ---
 
@@ -48,31 +48,31 @@ The system provides zero-code extensibility across **all 14 Indic languages** (*
 
 ```mermaid
 graph TD
-    A[Spoken Voice Audio / Text Bypass] --> B[Sarvam Saaras v3 STT + ffmpeg 16kHz Normalizer]
-    B --> C[Language Resolution: config.LANGUAGES Router]
-    C --> D[Guardrail 1: Tier-1 Fast Regex + Safety Patterns]
-    D -- Safe --> PG[Guardrail 2: Meta Prompt-Guard 86M Neural DPI Shield]
+    A[Spoken Voice Audio / Text Bypass] --> B[Sarvam Saaras STT Engine + ffmpeg 16kHz Normalizer]
+    B --> C[VECTOR Language Resolution Router: config.LANGUAGES]
+    C --> D[VECTOR Guardrail 1: Tier-1 Fast Stem Regex + Safety Patterns]
+    D -- Safe --> PG[VECTOR Guardrail 2: Meta Prompt-Guard 86M Neural DPI Shield]
     D -- Blocked --> X[Declined Response: Safety Violation]
-    PG -- Safe --> IF[Guardrail 3: Pre-Retrieval Query Intent Filter]
+    PG -- Safe --> IF[VECTOR Guardrail 3: Pre-Retrieval Query Intent Filter]
     PG -- Injected --> X
     IF -- Factual --> E[Query Embedding: 'query: ' Prefix multilingual-e5-small INT8]
     IF -- Non-Factual Intent --> X
-    E --> F[Guardrail 4: Centroid Distance Off-Topic Filter]
+    E --> F[VECTOR Guardrail 4: Centroid Distance Off-Topic Filter]
     F -- Off-Topic --> X
     F -- On-Topic --> CACHE{Dynamic Vector & Gold QA Cache}
     CACHE -- Cache Hit <0.5ms --> N[Grounded Response + Zero-Latency Fast Path]
-    CACHE -- Cache Miss --> G[Parallel Multi-Strategy FAISS HNSW Retrieval]
+    CACHE -- Cache Miss --> G[VECTOR Parallel Multi-Strategy FAISS HNSW Engine]
     G --> H1[Passage Native Index: 148,545 Vectors]
     G --> H2[Semantic LongDoc Index: 309 Vectors]
     H1 --> I[Candidate Merge & Reciprocal Rank Fusion RRF k=60]
     H2 --> I
-    I --> J[Adaptive Script-Aware BM25 Score Fusion]
+    I --> J[VECTOR Adaptive Script-Aware BM25 Score Fusion]
     J --> K[Relevance & Disqualification Gate: Dense / CE Threshold]
     K -- Score < Threshold --> Y[Declined Response: No Relevant Info in Corpus]
     K -- High Relevance --> CS[Context Chunk Safety: Batched Prompt-Guard 86M IPI Scan]
     CS -- Poisoned Chunks --> X
-    CS -- Clean Chunks --> L[Deterministic Non-LLM Context Synthesis: TextRank + SVD Energy]
-    L --> M[Post-Generation Grounding & Hallucination Guardrail]
+    CS -- Clean Chunks --> L[VECTOR Deterministic Context Synthesis: TextRank + SVD Energy]
+    L --> M[VECTOR Post-Generation Grounding & Hallucination Guardrail]
     M -- Grounded --> N[Grounded JSON Response + Full 9-Stage Telemetry]
     M -- Insufficient Info --> Y
 ```
@@ -244,19 +244,19 @@ pytest tests/ -v
 
 ```
 VECTOR/
-├── api/                  # FastAPI web server (/query, /health, /languages)
+├── api/                  # VECTOR FastAPI web server (/query, /health, /languages)
 ├── app/                  # Fast ONNX retriever & 50ms benchmark runner
 ├── benchmark/            # Latency, cold-start, & throughput evaluation scripts
 ├── chunking/             # Native, sentence-window, semantic, & RRF splitters
 ├── data/                 # FAISS HNSW indexes, centroids, JSONL corpora scripts
-├── demo/                 # Hacker House Goa 2026 Web Audio UI & assets
+├── demo/                 # VECTOR Web Audio UI & visual assets
 ├── generation/           # TextRank + SVD non-LLM synthesis & LLM fallback
 ├── guardrails/           # 4-tier cascaded pre-retrieval & post-gen grounding
 ├── pipeline/             # Async 9-stage pipeline state machine & schemas
 ├── retrieval/            # multilingual-e5-small INT8 ONNX & FAISS engine
-├── stt/                  # Sarvam Saaras v3 STT & ffmpeg 16kHz audio pipeline
+├── stt/                  # Sarvam Saaras STT & ffmpeg 16kHz audio pipeline
 ├── tests/                # 50/50 unit & integration test suite
-├── app.py                # Space entrypoint application
+├── app.py                # VECTOR Space entrypoint application
 ├── config.py             # Single source of truth configuration
 ├── Dockerfile            # Container definition for Hugging Face Spaces
 └── requirements.txt      # Python dependencies
@@ -264,15 +264,5 @@ VECTOR/
 
 ---
 
-## 🚀 Hugging Face Space Deployment
-
-Deployed via **Docker SDK** on Hugging Face Spaces:
-- **Live Space URL**: [https://ansh123456789-ragingoa.hf.space](https://ansh123456789-ragingoa.hf.space)
-
-> [!TIP]
-> Free `cpu-basic` Spaces sleep after 48h inactivity. Initial container spin-up takes **30–90s**. Warm runtime operates at **~7–16 ms**.
-
----
-
 ## 📜 License
-MIT License. Created for **Hacker House Goa 2026**.
+MIT License. VECTOR Multilingual RAG Engine.

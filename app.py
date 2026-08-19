@@ -1,5 +1,5 @@
 """
-Hugging Face Space Application for Hacker House Goa 2026: Voice-Enabled Indic RAG.
+Hugging Face Space Application for VECTOR: Voice-Enabled Indic RAG.
 Renders the full retro-tropical Command Center UI and exposes FastAPI endpoints.
 ZeroGPU compatible.
 """
@@ -74,7 +74,7 @@ def _dummy_zerogpu():
 
 
 # Create core FastAPI application
-app = FastAPI(title="🌴 Hacker House Goa 2026 — Voice-Enabled Indic RAG")
+app = FastAPI(title="⚡ VECTOR — Voice-Enabled Indic RAG")
 
 app.add_middleware(
     CORSMiddleware,
@@ -104,7 +104,7 @@ async def serve_index() -> HTMLResponse:
     if demo_file.exists():
         with open(demo_file, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>Hacker House Goa 2026 Command Center</h1>")
+    return HTMLResponse(content="<h1>VECTOR 2026 Command Center</h1>")
 
 
 @app.get("/health", response_class=JSONResponse)
@@ -204,7 +204,7 @@ async def query_pipeline(
 
 
 # Create Gradio interface block and mount on FastAPI app
-with gr.Blocks(title="🌴 Hacker House Goa 2026 — Voice Indic RAG") as demo:
+with gr.Blocks(title="⚡ VECTOR — Voice Indic RAG") as demo:
     gr.HTML(get_custom_html())
     dummy_btn = gr.Button("zero_gpu_anchor", visible=False)
     dummy_btn.click(fn=_dummy_zerogpu)
@@ -215,5 +215,5 @@ app = gr.mount_gradio_app(app, demo, path="/gradio")
 if __name__ == "__main__":
     port = int(os.getenv("PORT", "7860"))
     host = os.getenv("HOST", "0.0.0.0")
-    print(f"[Space Startup] Starting Hacker House Goa Command Center UI on http://{host}:{port}")
+    print(f"[Space Startup] Starting VECTOR Command Center UI on http://{host}:{port}")
     uvicorn.run(app, host=host, port=port)

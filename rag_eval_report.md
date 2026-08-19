@@ -1,7 +1,7 @@
 # RAG Evaluation Report
 
 **Author:** Manus AI  
-**Target:** [Hacker House Goa 2026 — Voice-Enabled Multilingual RAG](https://ansh123456789-ragingoa.hf.space/) [1]  
+**Target:** VECTOR — Voice-Enabled Multilingual Indic RAG [1]  
 **Evaluation date:** 16 August 2026  
 **Evaluation type:** Black-box VIGOURLS-style RAG evaluation battery
 
