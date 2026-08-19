@@ -30,7 +30,7 @@ The active runtime deployment loads **148,854 in-memory FAISS vectors** across 3
 
 ---
 
-## 🏛️ Horizontal Swimlane Architecture
+## 🏛️ Architecture
 
 ```mermaid
 graph LR
