@@ -149,55 +149,84 @@ VECTOR employs dynamic runtime configuration via `config.LANGUAGES` as the singl
 
 ---
 
-## ⚡ Benchmark Results
+## ⚡ Enterprise Performance & Benchmark Dashboard
 
-### 1. 🏎️ End-to-End Retrieval Latency (50ms Budget SLA)
-*Benchmarked on CPU: 8 vCPUs | 15.78 GB RAM | Windows 11 AMD64*
+> [!IMPORTANT]
+> **Hardware Environment Specs**: `8 vCPUs | 15.78 GB RAM | Windows 11 (AMD64) | 100% CPU Execution`  
+> All benchmarks are executed locally on CPU with zero GPU requirement.
+
+<div align="center">
+
+| Metric | Measured Value | Target SLA Budget | Margin / Performance |
+| :--- | :---: | :---: | :---: |
+| 🏎️ **Total Retrieval Latency** | **`7.04 ms`** | `50.00 ms` | ⚡ **84.0% Faster than Budget** |
+| ❄️ **Cold-Start 15-Lang Pass Rate** | **`100.0%`** | `< 200.00 ms` | ✅ **15/15 Languages Passed** |
+| 🚀 **System Throughput** | **`51.7 QPS`** | — | ⚡ **750 Queries in 14.5s** |
+| 🛡️ **Neural Threat Interception** | **`0.24 ms`** | `< 20.00 ms` | ⚡ **Sub-Millisecond Guard** |
+
+</div>
+
+---
+
+### 1. 🏎️ End-to-End Retrieval Latency Budget SLA (`python -m app.benchmark 50`)
+
+Measures combined query embedding vectorization (`intfloat/multilingual-e5-small` INT8 ONNX) + FAISS HNSW graph traversal ($148,545\text{ vectors}$) against the 50ms budget:
+
+```
+STAGE                   P50 LATENCY    PERCENTILE DISTRIBUTION & LATENCY SLAS
+─────────────────────────────────────────────────────────────────────────────────────
+Query Vectorization     █ 6.21 ms      [ P50: 6.21ms | P95: 7.28ms | P99: 7.94ms ] (INT8 ONNX)
+FAISS HNSW Traversal    █ 0.71 ms      [ P50: 0.71ms | P95: 0.93ms | P99: 1.16ms ] (Sub-1ms)
+─────────────────────────────────────────────────────────────────────────────────────
+TOTAL RETRIEVAL SLA     █ 6.96 ms      [ P95: 7.97ms | P99: 8.95ms | SLA: 50.00ms ] ✅ PASS
+```
 
 | Pipeline Retrieval Stage | Avg Latency | P50 (Median) | P95 Latency | P99 Latency | Budget SLA | Status |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Query Embedding (`multilingual-e5-small` ONNX)** | 6.31 ms | 6.21 ms | 7.28 ms | 7.94 ms | — | ⚡ Sub-8ms |
-| **FAISS HNSW Search (`148,545 vectors`)** | 0.73 ms | 0.71 ms | 0.93 ms | 1.16 ms | — | ⚡ Sub-1ms |
+| **Query Embedding (`multilingual-e5-small` ONNX)** | 6.31 ms | 6.21 ms | 7.28 ms | 7.94 ms | — | ⚡ ONNX Accelerated |
+| **FAISS HNSW Search (`148,545 vectors`)** | 0.73 ms | 0.71 ms | 0.93 ms | 1.16 ms | — | ⚡ Sub-1ms Graph Traversal |
 | **Total Retrieval Latency (Embed + Search)** | **7.04 ms** | **6.96 ms** | **7.97 ms** | **8.95 ms** | **50.00 ms** | ✅ **PASS (84% Faster)** |
 
 ---
 
-### 2. ❄️ Cold-Start Multilingual SLA Benchmark (15 Languages, Cache-Bypassed)
-*Evaluates uncached performance across all 15 languages (`bypass_cache=True`). SLA Budget: `< 200 ms`.*
+### 2. ❄️ Cold-Start Multilingual SLA Matrix (15 Languages, `bypass_cache=True`)
 
-| Language | Code | Context Guard | Cross-Encoder Rerank | Generation | Total Cold Latency | SLA Status |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **English** | `en` | 0.99 ms | 53.40 ms | 0.92 ms | **120.48 ms** | ✅ **PASS** |
-| **Hindi** | `hi` | 1.57 ms | 88.12 ms | 0.25 ms | **175.05 ms** | ✅ **PASS** |
-| **Tamil** | `ta` | 1.35 ms | 79.50 ms | 0.19 ms | **173.49 ms** | ✅ **PASS** |
-| **Telugu** | `te` | 1.21 ms | 90.72 ms | 0.18 ms | **164.77 ms** | ✅ **PASS** |
-| **Bengali** | `bn` | 1.96 ms | 93.57 ms | 0.17 ms | **162.78 ms** | ✅ **PASS** |
-| **Urdu** | `ur` | 1.58 ms | 103.12 ms | 0.21 ms | **169.99 ms** | ✅ **PASS** |
-| **Marathi** | `mr` | 1.59 ms | 103.31 ms | 0.23 ms | **177.35 ms** | ✅ **PASS** |
-| **Gujarati** | `gu` | 1.82 ms | 89.76 ms | 0.25 ms | **161.61 ms** | ✅ **PASS** |
-| **Kannada** | `kn` | 1.82 ms | 76.86 ms | 0.27 ms | **167.62 ms** | ✅ **PASS** |
-| **Malayalam** | `ml` | 1.82 ms | 83.41 ms | 0.16 ms | **170.34 ms** | ✅ **PASS** |
-| **Punjabi** | `pa` | 2.21 ms | 100.67 ms | 0.19 ms | **181.81 ms** | ✅ **PASS** |
-| **Assamese** | `as` | 1.83 ms | 110.64 ms | 0.23 ms | **194.22 ms** | ✅ **PASS** |
-| **Odia** | `or` | 1.99 ms | 86.99 ms | 0.23 ms | **178.73 ms** | ✅ **PASS** |
-| **Nepali** | `ne` | 1.31 ms | 109.84 ms | 0.23 ms | **184.45 ms** | ✅ **PASS** |
-| **Sanskrit** | `sa` | 0.00 ms | 66.14 ms | 0.00 ms | **145.40 ms** | ✅ **PASS** |
-| **Out-of-Domain Control** | `en` | 0.00 ms | 97.39 ms | 0.00 ms | **168.86 ms** | ✅ **PASS (Declined)** |
-| **Safety Control** | `en` | 0.00 ms | 0.00 ms | 0.00 ms | **0.24 ms** | ✅ **PASS (Blocked)** |
+Evaluates cold-path retrieval, reranking, context safety scanning, and grounded generation across all 15 languages with cache bypass to guarantee strict SLA compliance:
+
+| Language Family | Target Language | Code | Context Guard | Cross-Encoder Rerank | Generation | Total Cold Latency | SLA Status |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Indo-Aryan** | English | `en` | 0.99 ms | 53.40 ms | 0.92 ms | **120.48 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Hindi | `hi` | 1.57 ms | 88.12 ms | 0.25 ms | **175.05 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Marathi | `mr` | 1.59 ms | 103.31 ms | 0.23 ms | **177.35 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Gujarati | `gu` | 1.82 ms | 89.76 ms | 0.25 ms | **161.61 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Punjabi | `pa` | 2.21 ms | 100.67 ms | 0.19 ms | **181.81 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Assamese | `as` | 1.83 ms | 110.64 ms | 0.23 ms | **194.22 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Odia | `or` | 1.99 ms | 86.99 ms | 0.23 ms | **178.73 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Nepali | `ne` | 1.31 ms | 109.84 ms | 0.23 ms | **184.45 ms** | ✅ **SLA MET** |
+| **Indo-Aryan** | Sanskrit | `sa` | 0.00 ms | 66.14 ms | 0.00 ms | **145.40 ms** | ✅ **SLA MET** |
+| **Dravidian** | Tamil | `ta` | 1.35 ms | 79.50 ms | 0.19 ms | **173.49 ms** | ✅ **SLA MET** |
+| **Dravidian** | Telugu | `te` | 1.21 ms | 90.72 ms | 0.18 ms | **164.77 ms** | ✅ **SLA MET** |
+| **Dravidian** | Kannada | `kn` | 1.82 ms | 76.86 ms | 0.27 ms | **167.62 ms** | ✅ **SLA MET** |
+| **Dravidian** | Malayalam | `ml` | 1.82 ms | 83.41 ms | 0.16 ms | **170.34 ms** | ✅ **SLA MET** |
+| **Perso-Arabic** | Urdu | `ur` | 1.58 ms | 103.12 ms | 0.21 ms | **169.99 ms** | ✅ **SLA MET** |
+| **Bengali-Assamese** | Bengali | `bn` | 1.96 ms | 93.57 ms | 0.17 ms | **162.78 ms** | ✅ **SLA MET** |
+| **System Control** | Out-of-Domain | `en` | 0.00 ms | 97.39 ms | 0.00 ms | **168.86 ms** | ✅ **PASS (Declined)** |
+| **System Control** | Prompt Injection | `en` | 0.00 ms | 0.00 ms | 0.00 ms | **0.24 ms** | ✅ **PASS (Blocked)** |
 
 ---
 
 ### 3. 🚀 High-Throughput Speed Benchmark (750 Queries Total)
-*Throughput: `51.7 Queries/sec` (14.50 seconds total benchmark runtime across 15 languages)*
 
-| Pipeline Stage / Metric | P50 (Median) | P70 | P90 | P99 | Mean | Speedup Mechanism |
+Throughput: **`51.7 Queries / second`** across 15 Indic languages ($14.50\text{ seconds}$ total execution time):
+
+| Pipeline Stage / Metric | P50 (Median) | P70 | P90 | P99 | Mean Latency | Hardware Optimization Mechanism |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Query Embedding** | **15.18 ms** | 17.01 ms | 22.14 ms | 46.44 ms | 16.82 ms | ONNX Dynamic Shapes INT8 |
-| **FAISS Graph Search** | **< 0.90 ms** | < 0.90 ms | < 0.90 ms | 0.91 ms | 0.86 ms | HNSW Index + search_k |
-| **Cross-Encoder Rerank** | **26.70 ms** | 108.49 ms | 147.18 ms | 203.29 ms | 108.50 ms | ONNX MiniLM + Bounding |
-| **Context Synthesis** | **8.50 ms** | 8.80 ms | 9.20 ms | 12.40 ms | 8.80 ms | TextRank + SVD Energy |
-| **Cache Fast-Path** | **0.23 ms** | 0.28 ms | 0.35 ms | 0.70 ms | 0.35 ms | Dynamic LRU Vector Cache |
-| **Full Pipeline Latency** | **16.45 ms** | **18.27 ms** | **23.78 ms** | **57.71 ms** | **19.22 ms** | ⚡ **Sub-20ms Median** |
+| **Query Vectorization** | **15.18 ms** | 17.01 ms | 22.14 ms | 46.44 ms | 16.82 ms | ONNX Dynamic Shapes INT8 Quantization |
+| **FAISS Graph Search** | **< 0.90 ms** | < 0.90 ms | < 0.90 ms | 0.91 ms | 0.86 ms | In-Memory HNSW Graph + search_k Slicing |
+| **Cross-Encoder Rerank** | **26.70 ms** | 108.49 ms | 147.18 ms | 203.29 ms | 108.50 ms | ONNX MiniLM + 64-Token Bounding |
+| **Context Synthesis** | **8.50 ms** | 8.80 ms | 9.20 ms | 12.40 ms | 8.80 ms | Continuous TextRank + SVD Singular Energy |
+| **Cache Fast-Path** | **0.23 ms** | 0.28 ms | 0.35 ms | 0.70 ms | 0.35 ms | Dynamic In-Memory Vector LRU Cache |
+| **Full Pipeline Latency** | **16.45 ms** | **18.27 ms** | **23.78 ms** | **57.71 ms** | **19.22 ms** | ⚡ **Sub-20ms Median Full-Pipeline Execution** |
 
 ---
 
