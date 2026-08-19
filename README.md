@@ -1,15 +1,3 @@
----
-title: VECTOR - Voice Indic RAG Engine
-emoji: ⚡
-colorFrom: green
-colorTo: blue
-sdk: docker
-app_port: 7860
-pinned: false
-license: mit
-short_description: Voice Indic RAG with Sub-10ms FAISS Retrieval & 4-Tier Guardrails
----
-
 # ⚡ VECTOR: Voice-Enabled Multilingual Indic RAG Engine
 
 <div align="center">
