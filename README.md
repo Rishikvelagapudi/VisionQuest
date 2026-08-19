@@ -259,45 +259,152 @@ Throughput: **`51.7 Queries / second`** across 15 Indic languages ($14.50\text{ 
 
 ---
 
-## 🚀 Quickstart & Local Setup
+## 🚀 Quickstart & Comprehensive Local Setup
 
-### 1. Clone & Install
+### ⚙️ Prerequisites & System Requirements
+- **Python**: `Python 3.10+` (Tested on `3.11` and `3.13`)
+- **System Audio Normalizer**: `ffmpeg` (Required for 16kHz audio preprocessing in STT pipeline)
+- **RAM Allocation**: Minimum `8 GB` (`16 GB` recommended for loading full in-memory 15-language FAISS index)
+- **Hardware Acceleration**: `100% CPU Execution` via ONNX Runtime & FAISS-CPU (Zero GPU required)
+
+---
+
+### 1. 📦 Installation & Environment Setup
+
 ```bash
+# Clone the repository
 git clone https://github.com/Rishikvelagapudi/VECTOR.git
 cd VECTOR
+
+# Create and activate virtual environment
+python -m venv venv
+# On Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# On Linux / macOS:
+source venv/bin/activate
+
+# Upgrade pip and install all Python dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
+```
+
+---
+
+### 2. 🔑 Environment Configuration (`.env`)
+
+Copy the template file `.env.example` to `.env`:
+```bash
 cp .env.example .env
 ```
 
-### 2. Configure Environment Variables (`.env`)
+Configure your secrets in `.env`:
 ```env
+# Sarvam AI STT API Key (Saaras v3 Speech Recognition)
 SARVAM_API_KEY=your_sarvam_api_key_here
-LLM_API_KEY=your_groq_api_key_here
-LLM_BASE_URL=https://api.groq.com/openai/v1
-LLM_MODEL=llama-3.3-70b-versatile
+
+# Primary Generative Provider (Gemini Flash / OpenAI-compatible endpoint)
+GEMINI_API_KEY=your_gemini_api_key_here
+LLM_API_KEY=your_gemini_api_key_here
+LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
+LLM_MODEL=gemini-2.5-flash
+
+# Hard Safety Overrides & Offline Flags
+ALLOW_NETWORK_CALLS_IN_PIPELINE=true
+ENABLE_PROMPT_GUARD=true
+ENABLE_QUERY_INTENT_FILTER=true
+
+# Embedding & Search Engine Configuration
+EMBEDDING_MODEL_NAME=intfloat/multilingual-e5-small
+
+# Local Server Settings
+HOST=0.0.0.0
+PORT=7860
 ```
 
-### 3. Run Benchmark Suite
+> [!TIP]
+> **100% Offline Mode**: Setting `ALLOW_NETWORK_CALLS_IN_PIPELINE=false` forces VECTOR to bypass external LLM API calls and run purely on local CPU ONNX models and deterministic TextRank + SVD energy context synthesis.
+
+---
+
+### 3. 🖥️ Running Application Interfaces
+
+VECTOR provides 3 distinct execution entrypoints tailored for developers, API integrators, and terminal power users:
+
+#### Option A: Web Command Center UI (`python app.py`)
+Launches the full retro-tropical Web Audio Command Center UI with live Web Audio frequency canvas and real-time 9-stage telemetry waterfall:
 ```bash
-# 1. Run 50ms retrieval latency budget check
-python -m app.benchmark 50
-
-# 2. Run cold-start 15-language SLA benchmark
-python benchmark/run_cold_start_bench.py
-
-# 3. Run high-throughput 750-query speed benchmark
-python benchmark/run_speed_bench_50.py
-```
-
-### 4. Launch REST API & Web Command Center UI
-```bash
-# Run FastAPI server directly
-uvicorn api.main:app --host 0.0.0.0 --port 7860 --reload
-
-# Or launch Gradio Space entrypoint:
 python app.py
 ```
 Open **[http://localhost:7860](http://localhost:7860)** in your browser.
+
+#### Option B: High-Speed FastAPI REST Server (`uvicorn`)
+Runs the production REST API exposing `/query`, `/health`, and `/languages` endpoints:
+```bash
+uvicorn api.main:app --host 0.0.0.0 --port 7860 --reload
+```
+- Interactive OpenAPI / Swagger Docs: **[http://localhost:7860/docs](http://localhost:7860/docs)**
+- Health Check Status: `GET http://localhost:7860/health`
+- Active Languages Registry: `GET http://localhost:7860/languages`
+
+#### Option C: Interactive Terminal CLI (`demo/cli_demo.py`)
+Run instant terminal queries in text, audio, or interactive shell mode:
+```bash
+# 1. Direct text query with language hint:
+python demo/cli_demo.py --text "हृदय के चार कक्ष कौन से हैं?" --lang hi
+
+# 2. Audio file query:
+python demo/cli_demo.py --audio sample.wav --lang ta
+
+# 3. Interactive Shell Mode:
+python demo/cli_demo.py --interactive
+```
+
+---
+
+### 4. 🏎️ Running Benchmarks & Verification Suite
+
+```bash
+# 1. Run full 50-test unit & integration test suite (50/50 passing):
+pytest tests/ -v
+
+# 2. Run 50ms retrieval latency budget check (ONNX Embed + FAISS Traversal):
+python -m app.benchmark 50
+
+# 3. Run cold-start 15-language SLA benchmark (Cache-bypassed):
+python benchmark/run_cold_start_bench.py
+
+# 4. Run 750-query high-throughput speed benchmark (51.7 QPS):
+python benchmark/run_speed_bench_50.py
+```
+
+---
+
+### 5. 🛠️ Data Pipeline & Sample Index Builders
+
+Re-build FAISS HNSW indexes or extract MS MARCO multilingual corpora from scratch:
+```bash
+# Build sample FAISS HNSW indexes locally
+python build_sample_indices.py
+
+# Extract and deduplicate MS MARCO corpora for active languages
+python data/build_corpus.py
+
+# Extract and build all 15 language corpora streams
+python data/build_all_15_corpora.py
+```
+
+---
+
+### 6. 🐳 Docker Containerization & HF Spaces Deployment
+
+Build and run VECTOR inside a self-contained Docker container:
+```bash
+# Build Docker image
+docker build -t vector-rag .
+
+# Run container locally on port 7860
+docker run -p 7860:7860 --env-file .env vector-rag
+```
 
 ---
 
