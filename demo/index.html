@@ -555,22 +555,15 @@
         <!-- Terminal Container -->
         <div class="comic-panel p-5 flex flex-col items-center justify-center gap-4">
           
-          <!-- Star Shaped Spider Web Mic Radar (Reference Image Design) -->
-          <div class="relative w-64 h-64 flex items-center justify-center filter drop-shadow-[8px_8px_0px_#000000] my-2">
-            <!-- Outer Black Star Border Shell -->
-            <div class="absolute inset-0 bg-black clip-star-8 pointer-events-none"></div>
+          <!-- Circular Mic Radar Container (Clean Non-Star Design) -->
+          <div class="relative w-60 h-60 rounded-full bg-[#0a1e28] border-3.5 border-black shadow-brutal flex items-center justify-center overflow-hidden my-2">
+            <!-- Animated Interactive Spider Web Waveform Canvas -->
+            <canvas id="waveformCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
-            <!-- Inner Star Container with Dark Teal Background (#0a1e28) & Canvas -->
-            <div class="absolute inset-[3.5px] clip-star-8 bg-[#0a1e28] flex items-center justify-center overflow-hidden">
-              
-              <!-- Animated Interactive Spider Web Waveform Canvas -->
-              <canvas id="waveformCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
-
-              <!-- Circular Microphone Record Button (Hot Pink / Magenta Circle with White Mic Icon) -->
-              <button id="recordBtn" class="relative z-10 w-16 h-16 rounded-full bg-[#ff007f] hover:bg-[#e60073] active:scale-95 border-3 border-black flex items-center justify-center shadow-brutal transition cursor-pointer hover:scale-105 transition-transform duration-200">
-                <span id="micIcon" class="material-symbols-outlined text-3xl font-black text-white selection:bg-transparent">mic</span>
-              </button>
-            </div>
+            <!-- Circular Microphone Record Button (Hot Pink / Magenta Circle with White Mic Icon) -->
+            <button id="recordBtn" class="relative z-10 w-16 h-16 rounded-full bg-[#ff007f] hover:bg-[#e60073] active:scale-95 border-3 border-black flex items-center justify-center shadow-brutal transition cursor-pointer hover:scale-105 transition-transform duration-200">
+              <span id="micIcon" class="material-symbols-outlined text-3xl font-black text-white selection:bg-transparent">mic</span>
+            </button>
           </div>
 
           <!-- Query Input Bar (Pill Shape matching reference image) -->
