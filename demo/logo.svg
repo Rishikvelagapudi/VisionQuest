@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 300" width="100%" height="100%">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&amp;family=Rozha+One&amp;family=Yatra+One&amp;display=swap');
+      
+      .bg-emerald { fill: #0A5C36; }
+      
+      .text-hacker-house {
+        font-family: 'Rozha One', 'Cinzel Decorative', 'Times New Roman', serif;
+        font-size: 112px;
+        font-weight: 900;
+        fill: #FFC107;
+        letter-spacing: -2px;
+        text-anchor: middle;
+      }
+      
+      .text-goa-devanagari {
+        font-family: 'Yatra One', 'Rozha One', 'Devanagari', serif;
+        font-size: 105px;
+        font-weight: 900;
+        fill: #FF007F;
+        stroke: #FFC107;
+        stroke-width: 4px;
+        paint-order: stroke fill;
+        text-anchor: middle;
+        filter: drop-shadow(4px 4px 0px #000000);
+      }
+    </style>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="500" height="300" rx="16" class="bg-emerald" stroke="#000000" stroke-width="4" />
+
+  <!-- Top Line: HACKER -->
+  <text x="250" y="115" class="text-hacker-house" transform="scale(1, 1.15)" transform-origin="250 115">HACKER</text>
+
+  <!-- Bottom Line: HOUSE -->
+  <text x="250" y="245" class="text-hacker-house" transform="scale(1, 1.15)" transform-origin="250 245">HOUSE</text>
+
+  <!-- Center Overlay: गोवा -->
+  <g transform="translate(250, 168)">
+    <text x="0" y="24" class="text-goa-devanagari">गोवा</text>
+  </g>
+</svg>
