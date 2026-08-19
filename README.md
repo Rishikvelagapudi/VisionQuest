@@ -122,30 +122,30 @@ graph LR
 
 ---
 
-## 🌐 Language Extensibility Matrix
+## 🌐 Multilingual Indic Language Capability & Provisioning Matrix
 
-VECTOR treats `config.LANGUAGES` as the single source of truth for active runtime languages. Adding or removing languages from active memory requires changing only this configuration list. The underlying processed dataset contains **~743,000 deduplicated passages** across all 15 languages:
+VECTOR employs dynamic runtime configuration via `config.LANGUAGES` as the single source of truth for language federation. The engine provides zero-code hot-swappable expansion across **14 Indic languages** and **English** (~743,000 deduplicated passage records).
 
-| Code | Language | Script Family | Active Status | MS MARCO Dataset Source | Deduplicated Passages |
-| :--- | :--- | :--- | :---: | :--- | :--- |
-| **`en`** | English | Latin (`Latn`) | 🟢 **Active Loaded** | MS MARCO English Stream | 49,507 |
-| **`hi`** | Hindi | Devanagari (`Deva`) | 🟢 **Active Loaded** | `train/hintrain.parquet` & `val` | 49,509 |
-| **`mr`** | Marathi | Devanagari (`Deva`) | 🟢 **Active Loaded** | `train/martrain.parquet` | 49,529 |
-| **`as`** | Assamese | Bengali/Assamese (`Beng`) | 🟡 Zero-Code Extensible | `train/asmtrain.parquet` | 49,550 |
-| **`bn`** | Bengali | Bengali (`Beng`) | 🟡 Zero-Code Extensible | `train/bentrain.parquet` | 49,531 |
-| **`gu`** | Gujarati | Gujarati (`Gujr`) | 🟡 Zero-Code Extensible | `train/gujtrain.parquet` | 49,550 |
-| **`kn`** | Kannada | Kannada (`Knda`) | 🟡 Zero-Code Extensible | `train/kantrain.parquet` | 49,545 |
-| **`ml`** | Malayalam | Malayalam (`Mlym`) | 🟡 Zero-Code Extensible | `train/maltrain.parquet` | 49,542 |
-| **`ne`** | Nepali | Devanagari (`Deva`) | 🟡 Zero-Code Extensible | `train/neptrain.parquet` | 49,520 |
-| **`or`** | Odia | Odia (`Orya`) | 🟡 Zero-Code Extensible | `train/oritrain.parquet` | 49,560 |
-| **`pa`** | Punjabi | Gurmukhi (`Guru`) | 🟡 Zero-Code Extensible | `train/pantrain.parquet` | 49,534 |
-| **`sa`** | Sanskrit | Devanagari (`Deva`) | 🟡 Zero-Code Extensible | `validation/sanval.parquet` | 49,633 |
-| **`ta`** | Tamil | Tamil (`Taml`) | 🟡 Zero-Code Extensible | `train/tamtrain.parquet` & `val` | 49,581 |
-| **`te`** | Telugu | Telugu (`Telu`) | 🟡 Zero-Code Extensible | `validation/telval.parquet` | 49,604 |
-| **`ur`** | Urdu | Perso-Arabic (`Arab`) | 🟡 Zero-Code Extensible | `validation/urdval.parquet` | 49,576 |
+| ISO Code | Language Target | Script Family | STT Engine Endpoint | Runtime Provisioning Status | Corpus Benchmark Source | Deduplicated Passages |
+| :---: | :--- | :--- | :---: | :---: | :--- | :---: |
+| **`en`** | English | Latin (`Latn`) | `en-IN` | ⚡ **Active In-Memory Index** | MS MARCO English Native Stream | 49,507 |
+| **`hi`** | Hindi | Devanagari (`Deva`) | `hi-IN` | ⚡ **Active In-Memory Index** | MS MARCO-XI (`hin`) Parquet Stream | 49,509 |
+| **`mr`** | Marathi | Devanagari (`Deva`) | `mr-IN` | ⚡ **Active In-Memory Index** | MS MARCO-XI (`mar`) Parquet Stream | 49,529 |
+| **`as`** | Assamese | Bengali/Assamese (`Beng`) | `as-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`asm`) Parquet Stream | 49,550 |
+| **`bn`** | Bengali | Bengali (`Beng`) | `bn-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`ben`) Parquet Stream | 49,531 |
+| **`gu`** | Gujarati | Gujarati (`Gujr`) | `gu-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`guj`) Parquet Stream | 49,550 |
+| **`kn`** | Kannada | Kannada (`Knda`) | `kn-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`kan`) Parquet Stream | 49,545 |
+| **`ml`** | Malayalam | Malayalam (`Mlym`) | `ml-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`mal`) Parquet Stream | 49,542 |
+| **`ne`** | Nepali | Devanagari (`Deva`) | `ne-NP` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`nep`) Parquet Stream | 49,520 |
+| **`or`** | Odia | Odia (`Orya`) | `od-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`ori`) Parquet Stream | 49,560 |
+| **`pa`** | Punjabi | Gurmukhi (`Guru`) | `pa-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`pan`) Parquet Stream | 49,534 |
+| **`sa`** | Sanskrit | Devanagari (`Deva`) | `sa-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`san`) Parquet Stream | 49,633 |
+| **`ta`** | Tamil | Tamil (`Taml`) | `ta-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`tam`) Parquet Stream | 49,581 |
+| **`te`** | Telugu | Telugu (`Telu`) | `te-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`tel`) Parquet Stream | 49,604 |
+| **`ur`** | Urdu | Perso-Arabic (`Arab`) | `ur-IN` | 🔌 Zero-Code Hot-Swappable | MS MARCO-XI (`urd`) Parquet Stream | 49,576 |
 
 > [!NOTE]
-> Active Loaded In-Memory Vectors: **148,545 Native Passages** + **309 LongDoc Chunks** = **148,854 In-Memory Vectors**. Total available corpus across all 15 languages: **~743,000 Passages**.
+> **Active Memory Allocation**: **148,545 Native Passage Vectors** + **309 LongDoc Chunks** = **148,854 Active Vectors** in FAISS HNSW graph memory. **Total Available Federated Corpus**: **~743,000 Deduplicated Passages**.
 
 ---
 
