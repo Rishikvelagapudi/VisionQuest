@@ -25,7 +25,7 @@ from rag_pipeline.schemas import (
     StageTiming,
 )
 from vector_search.embed import get_embedder
-from vector_search.index_faiss import get_index_manager
+from vector_search import get_index_manager
 from vector_search.rerank import rerank_bm25_hybrid, rerank_cross_encoder, get_cross_encoder
 from doc_chunking.hybrid_merge import merge_and_fuse_candidates
 from safety_guardrails.pre_retrieval import check_unsafe_content, check_off_topic_query, check_query_intent, get_safety_telemetry

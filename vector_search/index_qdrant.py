@@ -24,6 +24,7 @@ try:
         Filter,
         FieldCondition,
         MatchValue,
+        PayloadSchemaType,
     )
     HAS_QDRANT = True
 except ImportError:
@@ -68,6 +69,16 @@ class StrategyQdrantIndex:
             )
             logger.info("Created Qdrant collection: '%s' (dim=%d)", self.collection_name, self.dim)
 
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="source_lang",
+                field_schema=PayloadSchemaType.KEYWORD,
+            )
+            logger.info("Ensured 'source_lang' keyword payload index for '%s'", self.collection_name)
+        except Exception as e:
+            logger.debug("Note creating payload index for '%s': %s", self.collection_name, e)
+
     @property
     def size(self) -> int:
         """Returns number of vectors in collection."""
@@ -109,18 +120,29 @@ class StrategyQdrantIndex:
 
     def search(
         self,
-        query_vector: np.ndarray,
-        top_k: int = 5,
-        lang_filter: Optional[str] = None,
-    ) -> List[Tuple[Chunk, float]]:
+        query_vec: np.ndarray,
+        target_lang: Optional[str] = None,
+        top_k: int = 15,
+        **kwargs,
+    ) -> List[Dict[str, Any]]:
         """
         Execute Qdrant cosine vector search with optional payload language filtering.
+        Returns candidate dicts identical to FAISS StrategyVectorIndex.search interface.
         """
-        if self.size == 0:
+        q_vec = query_vec if query_vec is not None else kwargs.get("query_vector")
+        lang_filter = target_lang if target_lang is not None else kwargs.get("lang_filter")
+        
+        if q_vec is None or self.size == 0:
             return []
 
-        norm = np.linalg.norm(query_vector)
-        unit_q = (query_vector / norm).tolist() if norm > 1e-9 else query_vector.tolist()
+        # Ensure query vector is 1D float array (384,) to prevent multi-vector 400 error in Qdrant
+        if isinstance(q_vec, np.ndarray):
+            q_vec = q_vec.reshape(-1)
+        elif isinstance(q_vec, list) and len(q_vec) > 0 and isinstance(q_vec[0], list):
+            q_vec = q_vec[0]
+
+        norm = np.linalg.norm(q_vec)
+        unit_q = (np.array(q_vec) / (norm + 1e-12)).astype(float).tolist()
 
         qdrant_filter = None
         if lang_filter and lang_filter.strip():
@@ -133,22 +155,42 @@ class StrategyQdrantIndex:
                 ]
             )
 
-        if hasattr(self.client, "query_points"):
-            search_result = self.client.query_points(
-                collection_name=self.collection_name,
-                query=unit_q,
-                query_filter=qdrant_filter,
-                limit=top_k,
-            ).points
-        else:
-            search_result = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=unit_q,
-                query_filter=qdrant_filter,
-                limit=top_k,
-            )
+        search_result = []
+        try:
+            if hasattr(self.client, "query_points"):
+                search_result = self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=unit_q,
+                    query_filter=qdrant_filter,
+                    limit=top_k,
+                ).points
+            else:
+                search_result = self.client.search(
+                    collection_name=self.collection_name,
+                    query_vector=unit_q,
+                    query_filter=qdrant_filter,
+                    limit=top_k,
+                )
+        except Exception as e:
+            logger.warning("Filtered Qdrant query encounter (%s); executing fallback query...", e)
+            try:
+                if hasattr(self.client, "query_points"):
+                    search_result = self.client.query_points(
+                        collection_name=self.collection_name,
+                        query=unit_q,
+                        limit=top_k,
+                    ).points
+                else:
+                    search_result = self.client.search(
+                        collection_name=self.collection_name,
+                        query_vector=unit_q,
+                        limit=top_k,
+                    )
+            except Exception as e2:
+                logger.error("Qdrant query execution error: %s", e2)
+                return []
 
-        results: List[Tuple[Chunk, float]] = []
+        results: List[Dict[str, Any]] = []
         for hit in search_result:
             payload = hit.payload or {}
             idx = payload.get("idx", 0)
@@ -168,9 +210,18 @@ class StrategyQdrantIndex:
                     metadata=payload.get("metadata", {}),
                 )
             
-            # Qdrant score is cosine similarity [0, 1]
             score = float(hit.score)
-            results.append((chunk, score))
+            results.append({
+                "chunk_id": chunk.chunk_id,
+                "text": chunk.text,
+                "score": score,
+                "source_lang": chunk.source_lang,
+                "chunk_strategy": chunk.chunk_strategy,
+                "source_query_ids": getattr(chunk, "source_query_ids", []),
+                "doc_id": chunk.doc_id,
+                "context_window": getattr(chunk, "context_window", None),
+                "metadata": chunk.metadata,
+            })
 
         return results
 
@@ -200,6 +251,7 @@ class QdrantIndexManager:
 
         self.strategy_indices: Dict[str, StrategyQdrantIndex] = {}
         self.centroids: Dict[str, np.ndarray] = {}
+        self.load_all_indexes()
 
     @property
     def indexes(self) -> Dict[str, StrategyQdrantIndex]:
@@ -227,17 +279,19 @@ class QdrantIndexManager:
     def search(
         self,
         strategy_name: str,
-        query_vector: np.ndarray,
-        top_k: int = 5,
-        lang_filter: Optional[str] = None,
-    ) -> List[Tuple[Chunk, float]]:
+        query_vec: np.ndarray,
+        target_lang: Optional[str] = None,
+        top_k: int = 15,
+        **kwargs,
+    ) -> List[Dict[str, Any]]:
         if strategy_name not in self.strategy_indices:
             logger.warning("Strategy '%s' not indexed in Qdrant", strategy_name)
             return []
         return self.strategy_indices[strategy_name].search(
-            query_vector=query_vector,
+            query_vec=query_vec,
+            target_lang=target_lang,
             top_k=top_k,
-            lang_filter=lang_filter,
+            **kwargs,
         )
 
     def compute_centroids(self):
@@ -316,7 +370,9 @@ class QdrantIndexManager:
 
     def load_all_indexes(self):
         """Auto-recovers or populates Qdrant Cloud indexes."""
-        self.build_all_indexes()
+        for strat in ["passage_native", "semantic_longdoc"]:
+            self.get_or_create_index(strat)
+        logger.info("[QdrantManager] Loaded active strategy indexes: %s", list(self.strategy_indices.keys()))
 
 
 _QDRANT_MANAGER_INSTANCE: Optional[QdrantIndexManager] = None

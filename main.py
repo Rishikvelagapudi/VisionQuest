@@ -55,7 +55,7 @@ import config
 from rag_pipeline.orchestrator import get_orchestrator
 from rag_pipeline.schemas import QueryRequest, QueryResponse
 from vector_search.embed import get_embedder
-from vector_search.index_faiss import get_index_manager
+from vector_search import get_index_manager
 
 
 # Read the full custom HTML Command Center UI
