@@ -21,15 +21,15 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
-from guardrails.pre_retrieval import (
+from safety_guardrails.pre_retrieval import (
     check_unsafe_content,
     check_query_intent,
     check_off_topic_query,
     get_safety_telemetry,
 )
-from guardrails.prompt_guard import get_prompt_guard_detector, PromptGuardResult, PromptGuardDetector
-from pipeline.schemas import QueryRequest, QueryResponse, GuardrailFlags
-from pipeline.orchestrator import get_orchestrator, RAGPipelineOrchestrator
+from safety_guardrails.prompt_guard import get_prompt_guard_detector, PromptGuardResult, PromptGuardDetector
+from rag_pipeline.schemas import QueryRequest, QueryResponse, GuardrailFlags
+from rag_pipeline.orchestrator import get_orchestrator, RAGPipelineOrchestrator
 
 
 class TestDiagnosisFailedExamples:

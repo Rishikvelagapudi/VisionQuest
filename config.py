@@ -68,11 +68,11 @@ def get_language_info(lang_code: str) -> dict:
 # 2. PATHS CONFIGURATION
 # ==========================================
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR / "knowledge_base"))
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 INDEX_DIR = DATA_DIR / "indexes"
-BENCHMARK_RESULTS_DIR = BASE_DIR / "benchmark" / "results"
+BENCHMARK_RESULTS_DIR = BASE_DIR / "latency_benchmarks" / "results"
 
 for d in [DATA_DIR, RAW_DATA_DIR, PROCESSED_DATA_DIR, INDEX_DIR, BENCHMARK_RESULTS_DIR]:
     d.mkdir(parents=True, exist_ok=True)

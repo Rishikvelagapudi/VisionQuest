@@ -52,15 +52,15 @@ except ImportError:
             return func
 
 import config
-from pipeline.orchestrator import get_orchestrator
-from pipeline.schemas import QueryRequest, QueryResponse
-from retrieval.embed import get_embedder
-from retrieval.index_faiss import get_index_manager
+from rag_pipeline.orchestrator import get_orchestrator
+from rag_pipeline.schemas import QueryRequest, QueryResponse
+from vector_search.embed import get_embedder
+from vector_search.index_faiss import get_index_manager
 
 
 # Read the full custom HTML Command Center UI
 def get_custom_html() -> str:
-    demo_file = config.BASE_DIR / "demo" / "index.html"
+    demo_file = config.BASE_DIR / "web_ui" / "index.html"
     if demo_file.exists():
         with open(demo_file, "r", encoding="utf-8") as f:
             return f.read()
@@ -100,7 +100,7 @@ async def startup_event():
 @app.get("/", response_class=HTMLResponse)
 async def serve_index() -> HTMLResponse:
     """Serve full retro-tropical Command Center UI directly to browser."""
-    demo_file = config.BASE_DIR / "demo" / "index.html"
+    demo_file = config.BASE_DIR / "web_ui" / "index.html"
     if demo_file.exists():
         with open(demo_file, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
@@ -110,7 +110,7 @@ async def serve_index() -> HTMLResponse:
 @app.get("/ironman.png")
 async def serve_ironman() -> FileResponse:
     """Serve Iron Man sprite image."""
-    img_path = config.BASE_DIR / "demo" / "ironman.png"
+    img_path = config.BASE_DIR / "web_ui" / "ironman.png"
     if img_path.exists():
         return FileResponse(img_path)
     raise HTTPException(status_code=404, detail="Iron Man image missing")
@@ -119,7 +119,7 @@ async def serve_ironman() -> FileResponse:
 @app.get("/thor.png")
 async def serve_thor() -> FileResponse:
     """Serve Thor sprite image."""
-    img_path = config.BASE_DIR / "demo" / "thor.png"
+    img_path = config.BASE_DIR / "web_ui" / "thor.png"
     if img_path.exists():
         return FileResponse(img_path)
     raise HTTPException(status_code=404, detail="Thor image missing")
@@ -128,7 +128,7 @@ async def serve_thor() -> FileResponse:
 @app.get("/cap.png")
 async def serve_cap() -> FileResponse:
     """Serve Captain America sprite image."""
-    img_path = config.BASE_DIR / "demo" / "cap.png"
+    img_path = config.BASE_DIR / "web_ui" / "cap.png"
     if img_path.exists():
         return FileResponse(img_path)
     raise HTTPException(status_code=404, detail="Captain America image missing")

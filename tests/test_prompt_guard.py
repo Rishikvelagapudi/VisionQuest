@@ -4,8 +4,8 @@ Unit and benchmark tests for Meta Prompt-Guard 86M Sub-10ms Guardrail.
 
 import time
 import pytest
-from guardrails.prompt_guard import get_prompt_guard_detector, PromptGuardResult
-from guardrails.pre_retrieval import normalize_and_unpack_text, check_unsafe_content
+from safety_guardrails.prompt_guard import get_prompt_guard_detector, PromptGuardResult
+from safety_guardrails.pre_retrieval import normalize_and_unpack_text, check_unsafe_content
 
 
 @pytest.fixture(scope="module")

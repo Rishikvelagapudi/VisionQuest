@@ -13,24 +13,24 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
-from chunking.metadata import (
+from doc_chunking.metadata import (
     Chunk,
     filter_chunks_by_language,
     split_sentences_multilingual,
     calculate_overlap_tokens,
     estimate_token_count,
 )
-from chunking.passage_native import chunk_passage_native
-from chunking.sentence_window import chunk_document_sentence_window
-from chunking.semantic import chunk_document_semantic
-from chunking.hybrid_merge import merge_and_fuse_candidates
-from retrieval.rerank import rerank_bm25_hybrid, tokenize_for_bm25
-from guardrails.pre_retrieval import check_unsafe_content, check_off_topic_query
-from guardrails.post_generation import check_grounding, compute_lexical_grounding_score
-from generation.extractive import extract_answer_from_passage, generate_extractive
-from generation.llm_fallback import LLMAdapter
-from pipeline.schemas import QueryRequest, QueryResponse, StageTiming
-from pipeline.orchestrator import get_orchestrator
+from doc_chunking.passage_native import chunk_passage_native
+from doc_chunking.sentence_window import chunk_document_sentence_window
+from doc_chunking.semantic import chunk_document_semantic
+from doc_chunking.hybrid_merge import merge_and_fuse_candidates
+from vector_search.rerank import rerank_bm25_hybrid, tokenize_for_bm25
+from safety_guardrails.pre_retrieval import check_unsafe_content, check_off_topic_query
+from safety_guardrails.post_generation import check_grounding, compute_lexical_grounding_score
+from llm_synthesis.extractive import extract_answer_from_passage, generate_extractive
+from llm_synthesis.llm_fallback import LLMAdapter
+from rag_pipeline.schemas import QueryRequest, QueryResponse, StageTiming
+from rag_pipeline.orchestrator import get_orchestrator
 
 
 class TestLanguageExtensibility:
@@ -296,7 +296,7 @@ class TestEndToEndPipeline:
         assert len(resp.answer) > 20
 
     def test_robust_json_parser_handles_markdown_and_edge_cases(self):
-        from guardrails.pre_retrieval import robust_json_parser
+        from safety_guardrails.pre_retrieval import robust_json_parser
         
         # Standard JSON
         p1 = robust_json_parser('{"is_safe": true, "reason": "ok"}')

@@ -6,9 +6,9 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=7860 \
     HOST=0.0.0.0 \
-    DATA_DIR=/app/data \
-    INDEX_DIR=/app/data/indexes \
-    PROCESSED_DIR=/app/data/processed \
+    DATA_DIR=/app/knowledge_base \
+    INDEX_DIR=/app/knowledge_base/indexes \
+    PROCESSED_DIR=/app/knowledge_base/processed \
     HF_HOME=/app/.cache/huggingface
 
 WORKDIR /app
@@ -33,16 +33,16 @@ RUN python -c "from transformers import AutoTokenizer, AutoModel; AutoTokenizer.
 # Copy application source code and pre-built index/processed artifacts
 COPY config.py .
 COPY app.py .
-COPY data/ ./data/
-COPY chunking/ ./chunking/
-COPY retrieval/ ./retrieval/
-COPY stt/ ./stt/
-COPY guardrails/ ./guardrails/
-COPY generation/ ./generation/
-COPY pipeline/ ./pipeline/
-COPY api/ ./api/
-COPY benchmark/ ./benchmark/
-COPY demo/ ./demo/
+COPY knowledge_base/ ./knowledge_base/
+COPY doc_chunking/ ./doc_chunking/
+COPY vector_search/ ./vector_search/
+COPY voice_stt/ ./voice_stt/
+COPY safety_guardrails/ ./safety_guardrails/
+COPY llm_synthesis/ ./llm_synthesis/
+COPY rag_pipeline/ ./rag_pipeline/
+COPY api_endpoints/ ./api_endpoints/
+COPY latency_benchmarks/ ./latency_benchmarks/
+COPY web_ui/ ./web_ui/
 
 # Create user for Hugging Face Spaces security
 RUN useradd -m -u 1000 user && \
@@ -53,4 +53,4 @@ USER user
 EXPOSE 7860
 
 # Launch FastAPI server
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["python", "app.py"]
