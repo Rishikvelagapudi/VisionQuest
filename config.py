@@ -105,6 +105,10 @@ if _MAX_PASSAGES_ENV is None or _MAX_PASSAGES_ENV.strip() == "":
     MAX_INDEX_PASSAGES_PER_LANG = None  # explicit: no cap, not a silent fallback
 else:
     MAX_INDEX_PASSAGES_PER_LANG = int(_MAX_PASSAGES_ENV)
+# Vector Database Engine Selection ("faiss" or "qdrant")
+VECTOR_STORE_BACKEND = os.getenv("VECTOR_STORE_BACKEND", "faiss").lower()
+QDRANT_STORAGE_PATH = Path(os.getenv("QDRANT_STORAGE_PATH", DATA_DIR / "qdrant_db"))
+
 HNSW_M = 32
 HNSW_EF_CONSTRUCTION = 200
 HNSW_EF_SEARCH = 64

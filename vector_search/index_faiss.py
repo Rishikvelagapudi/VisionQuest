@@ -454,9 +454,12 @@ class IndexManager:
 _INDEX_MANAGER: Optional[IndexManager] = None
 
 
-def get_index_manager() -> IndexManager:
-    """Singleton getter for IndexManager."""
+def get_index_manager() -> Any:
+    """Singleton getter for IndexManager (supports FAISS and Qdrant vector backends)."""
     global _INDEX_MANAGER
+    if getattr(config, "VECTOR_STORE_BACKEND", "faiss").lower() == "qdrant":
+        from vector_search.index_qdrant import get_qdrant_manager
+        return get_qdrant_manager()
     if _INDEX_MANAGER is None:
         _INDEX_MANAGER = IndexManager()
         _INDEX_MANAGER.load_all_indexes()
