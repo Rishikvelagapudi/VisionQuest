@@ -180,7 +180,13 @@ class QdrantIndexManager:
         if not HAS_QDRANT:
             raise ImportError("qdrant-client package is required for Qdrant vector backend.")
             
-        if in_memory:
+        qdrant_url = getattr(config, "QDRANT_URL", "")
+        qdrant_key = getattr(config, "QDRANT_API_KEY", "")
+
+        if qdrant_url and qdrant_url.strip():
+            self.client = QdrantClient(url=qdrant_url.strip(), api_key=qdrant_key.strip() if qdrant_key else None)
+            logger.info("Initialized Qdrant Cloud Vector Engine at '%s'.", qdrant_url)
+        elif in_memory:
             self.client = QdrantClient(":memory:")
             logger.info("Initialized Qdrant In-Memory Vector Storage Engine.")
         else:

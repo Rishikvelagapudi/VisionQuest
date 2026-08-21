@@ -108,6 +108,8 @@ else:
 # Vector Database Engine Selection ("faiss" or "qdrant")
 VECTOR_STORE_BACKEND = os.getenv("VECTOR_STORE_BACKEND", "faiss").lower()
 QDRANT_STORAGE_PATH = Path(os.getenv("QDRANT_STORAGE_PATH", DATA_DIR / "qdrant_db"))
+QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
+QDRANT_URL = os.getenv("QDRANT_URL", "")
 
 HNSW_M = 32
 HNSW_EF_CONSTRUCTION = 200
