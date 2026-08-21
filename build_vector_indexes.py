@@ -8,8 +8,9 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config
-from data.tech_data import EN_TECH_PASSAGES, HI_TECH_PASSAGES, MR_TECH_PASSAGES, TECH_LONGDOCS
-from data.movie_data import EN_MOVIE_PASSAGES, HI_MOVIE_PASSAGES, MR_MOVIE_PASSAGES, MOVIE_LONGDOCS
+from knowledge_base.tech_data import EN_TECH_PASSAGES, HI_TECH_PASSAGES, MR_TECH_PASSAGES, TECH_LONGDOCS
+from knowledge_base.movie_data import EN_MOVIE_PASSAGES, HI_MOVIE_PASSAGES, MR_MOVIE_PASSAGES, MOVIE_LONGDOCS
+from vector_search.index_faiss import get_index_manager
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", force=True)
 logger = logging.getLogger(__name__)

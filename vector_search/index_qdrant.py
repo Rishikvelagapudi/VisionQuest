@@ -32,6 +32,9 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config
 from doc_chunking.metadata import Chunk
+from doc_chunking.passage_native import process_corpus_passage_native
+from doc_chunking.sentence_window import process_longdocs_sentence_window
+from doc_chunking.semantic import process_longdocs_semantic
 from vector_search.embed import get_embedder
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", force=True)
@@ -198,6 +201,21 @@ class QdrantIndexManager:
         self.strategy_indices: Dict[str, StrategyQdrantIndex] = {}
         self.centroids: Dict[str, np.ndarray] = {}
 
+    @property
+    def indexes(self) -> Dict[str, StrategyQdrantIndex]:
+        """Alias for compatibility with FAISSIndexManager."""
+        return self.strategy_indices
+
+    @property
+    def global_centroid(self) -> Optional[np.ndarray]:
+        """Compute and return global centroid across all corpus centroids."""
+        if not self.centroids:
+            return None
+        all_vecs = list(self.centroids.values())
+        mean_v = np.mean(np.array(all_vecs), axis=0)
+        norm = np.linalg.norm(mean_v)
+        return (mean_v / norm) if norm > 1e-9 else mean_v
+
     def get_or_create_index(self, strategy_name: str) -> StrategyQdrantIndex:
         if strategy_name not in self.strategy_indices:
             self.strategy_indices[strategy_name] = StrategyQdrantIndex(
@@ -232,7 +250,7 @@ class QdrantIndexManager:
                 lang = chunk.source_lang.lower()
                 if lang not in lang_vectors:
                     lang_vectors[lang] = []
-                vec = embedder.embed_text(chunk.text)
+                vec = embedder.encode_passages([chunk.text])[0]
                 lang_vectors[lang].append(vec)
                 
         for lang, vecs in lang_vectors.items():
@@ -248,6 +266,57 @@ class QdrantIndexManager:
 
     def get_all_centroids(self) -> Dict[str, np.ndarray]:
         return self.centroids
+
+    def build_all_indexes(self, max_passages_per_lang: Optional[int] = None):
+        """
+        Build and populate all chunking strategies into Qdrant Cloud Cluster.
+        """
+        logger.info("[QdrantManager] Building and indexing all corpora into Qdrant Cloud...")
+        embedder = get_embedder()
+        
+        # 1. Passage Native Strategy
+        passage_index = self.get_or_create_index("passage_native")
+        for lang in config.LANGUAGES:
+            corpus_file = config.PROCESSED_DATA_DIR / f"{lang}_corpus.jsonl"
+            if not corpus_file.exists():
+                continue
+            records = []
+            with open(corpus_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        records.append(json.loads(line))
+            if records:
+                chunks = process_corpus_passage_native(records)
+                texts = [c.embed_text for c in chunks]
+                vecs = embedder.encode_passages(texts)
+                passage_index.add_chunks(chunks, vecs)
+                logger.info("[Qdrant] Indexed %d passage-native chunks for language '%s'", len(chunks), lang)
+
+        # 2. Semantic Longdoc Strategy
+        longdoc_index = self.get_or_create_index("semantic_longdoc")
+        for lang in config.LANGUAGES:
+            longdoc_file = config.PROCESSED_DATA_DIR / f"{lang}_longdocs.jsonl"
+            if not longdoc_file.exists():
+                continue
+            records = []
+            with open(longdoc_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip():
+                        records.append(json.loads(line))
+            if records:
+                chunks = process_longdocs_sentence_window(records) + process_longdocs_semantic(records)
+                if chunks:
+                    texts = [c.embed_text for c in chunks]
+                    vecs = embedder.encode_passages(texts)
+                    longdoc_index.add_chunks(chunks, vecs)
+                    logger.info("[Qdrant] Indexed %d longdoc chunks for language '%s'", len(chunks), lang)
+
+        self.compute_centroids()
+        logger.info("[QdrantManager] Qdrant Cloud indexing complete across all strategies!")
+
+    def load_all_indexes(self):
+        """Auto-recovers or populates Qdrant Cloud indexes."""
+        self.build_all_indexes()
 
 
 _QDRANT_MANAGER_INSTANCE: Optional[QdrantIndexManager] = None
