@@ -79,7 +79,6 @@ class LLMAdapter:
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {api_key.strip()}",
-            "x-goog-api-key": api_key.strip(),
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) VoiceRAG/1.0",
         }
         
@@ -100,7 +99,7 @@ class LLMAdapter:
         """
         Generate synthesized response grounded strictly in provided context passages.
         Cascade Hierarchy:
-        1. Primary: Gemini Flash / Main LLM (e.g. gemini-2.5-flash, gemini-2.0-flash)
+        1. Primary: Groq Llama-3.3 70B / Mixtral (~150ms)
         2. Tier-2 Backup: Cerebras Gemma 4 31b (gemma-4-31b)
         3. Tier-3 Backup: Cerebras GPT-OSS 120b (gpt-oss-120b)
         4. Tier-4 Local: Deterministic multi-passage extractive fallback
@@ -108,16 +107,14 @@ class LLMAdapter:
         if not config.ALLOW_NETWORK_CALLS_IN_PIPELINE:
             return self._local_fallback_synthesize(prompt, context)
 
-        # Tier 1: Primary LLM (Gemini Flash / OpenAI-compatible)
+        # Tier 1: Primary LLM (Groq Llama-3.3 / OpenAI-compatible)
         if self.api_key and self.api_key.strip():
-            # Try configured model (with instant flash fallbacks on 429)
+            # Try configured Groq model with ultra-fast fallbacks on 429
             primary_models = [self.model]
-            if "googleapis.com" in self.base_url or "gemini" in self.model.lower():
-                for alt_m in ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
+            if "groq.com" in self.base_url or "llama" in self.model.lower() or "groq" in self.model.lower():
+                for alt_m in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "llama3-70b-8192"]:
                     if alt_m not in primary_models:
                         primary_models.append(alt_m)
-            elif "groq.com" in self.base_url and self.model != "llama-3.1-8b-instant":
-                primary_models.append("llama-3.1-8b-instant")
                 
             for m in primary_models:
                 res = self._call_chat_endpoint(

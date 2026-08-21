@@ -191,11 +191,11 @@ DYNAMIC_SEMANTIC_CACHE_ENABLED = os.getenv("DYNAMIC_SEMANTIC_CACHE_ENABLED", "tr
 DYNAMIC_SEMANTIC_CACHE_MAX_ENTRIES = int(os.getenv("DYNAMIC_SEMANTIC_CACHE_MAX_ENTRIES", "2048"))
 DYNAMIC_SEMANTIC_CACHE_THRESHOLD = float(os.getenv("DYNAMIC_SEMANTIC_CACHE_THRESHOLD", "0.92"))
 
-# Tier-1 Primary: Gemini Flash / OpenAI-compatible (High-speed instruction model, ~250ms)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
-LLM_API_KEY = os.getenv("LLM_API_KEY", GEMINI_API_KEY or os.getenv("GROQ_API_KEY", ""))
-LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/" if (GEMINI_API_KEY or not os.getenv("GROQ_API_KEY")) else "https://api.groq.com/openai/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemini-2.5-flash" if ("googleapis.com" in LLM_BASE_URL or GEMINI_API_KEY or not os.getenv("GROQ_API_KEY")) else "llama-3.3-70b-versatile")
+# Tier-1 Primary: Groq High-Speed Llama-3.3 / Mixtral API (~150ms)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", os.getenv("LLM_API_KEY", ""))
+LLM_API_KEY = os.getenv("LLM_API_KEY", GROQ_API_KEY)
+LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
+LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
 LLM_TIMEOUT_SECONDS = 15.0
 
 # Tier-2 & Tier-3 Backup: Cerebras High-Speed LPU (120B model for high instruction following)
