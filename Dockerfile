@@ -32,7 +32,7 @@ RUN python -c "from transformers import AutoTokenizer, AutoModel; AutoTokenizer.
 
 # Copy application source code and pre-built index/processed artifacts
 COPY config.py .
-COPY app.py .
+COPY main.py .
 COPY knowledge_base/ ./knowledge_base/
 COPY doc_chunking/ ./doc_chunking/
 COPY vector_search/ ./vector_search/
@@ -53,4 +53,4 @@ USER user
 EXPOSE 7860
 
 # Launch FastAPI server
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
