@@ -34,7 +34,7 @@ except Exception:
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 import gradio as gr
 import uvicorn
 
@@ -105,6 +105,33 @@ async def serve_index() -> HTMLResponse:
         with open(demo_file, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
     return HTMLResponse(content="<h1>VECTOR 2026 Command Center</h1>")
+
+
+@app.get("/ironman.png")
+async def serve_ironman() -> FileResponse:
+    """Serve Iron Man sprite image."""
+    img_path = config.BASE_DIR / "demo" / "ironman.png"
+    if img_path.exists():
+        return FileResponse(img_path)
+    raise HTTPException(status_code=404, detail="Iron Man image missing")
+
+
+@app.get("/thor.png")
+async def serve_thor() -> FileResponse:
+    """Serve Thor sprite image."""
+    img_path = config.BASE_DIR / "demo" / "thor.png"
+    if img_path.exists():
+        return FileResponse(img_path)
+    raise HTTPException(status_code=404, detail="Thor image missing")
+
+
+@app.get("/cap.png")
+async def serve_cap() -> FileResponse:
+    """Serve Captain America sprite image."""
+    img_path = config.BASE_DIR / "demo" / "cap.png"
+    if img_path.exists():
+        return FileResponse(img_path)
+    raise HTTPException(status_code=404, detail="Captain America image missing")
 
 
 @app.get("/health", response_class=JSONResponse)

@@ -357,6 +357,8 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col relative selection:bg-sunyellow selection:text-black">
+  <!-- Full-Page Flying Iron Man Canvas Layer (Behind Frame Boxes) -->
+  <canvas id="ironmanMainCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-1"></canvas>
 
   <!-- TROPICAL EMERALD BEACH VECTOR ARTWORK BACKGROUND (MATCHES REFERENCE IMAGE) -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden flex items-center justify-center">
@@ -555,14 +557,14 @@
         <!-- Terminal Container -->
         <div class="comic-panel p-5 flex flex-col items-center justify-center gap-4">
           
-          <!-- Circular Mic Radar Container (Clean Non-Star Design) -->
-          <div class="relative w-60 h-60 rounded-full bg-[#0a1e28] border-3.5 border-black shadow-brutal flex items-center justify-center overflow-hidden my-2">
-            <!-- Animated Interactive Spider Web Waveform Canvas -->
+          <!-- Spider-Man Green Mask Canvas Container (#053b22 Forest Green Theme) -->
+          <div class="relative w-64 h-64 rounded-full bg-[#053b22] border-4 border-[#053b22] shadow-[0_0_25px_rgba(5,59,34,0.8)] flex items-center justify-center overflow-hidden my-2">
+            <!-- Animated Spider-Man Mask Waveform Canvas -->
             <canvas id="waveformCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
 
-            <!-- Circular Microphone Record Button (Hot Pink / Magenta Circle with White Mic Icon) -->
-            <button id="recordBtn" class="relative z-10 w-16 h-16 rounded-full bg-[#ff007f] hover:bg-[#e60073] active:scale-95 border-3 border-black flex items-center justify-center shadow-brutal transition cursor-pointer hover:scale-105 transition-transform duration-200">
-              <span id="micIcon" class="material-symbols-outlined text-3xl font-black text-white selection:bg-transparent">mic</span>
+            <!-- Microphone Record Button (Only Mic Icon, Green Spider-Man Theme) -->
+            <button id="recordBtn" class="relative z-10 p-3 flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 transition-transform duration-200 focus:outline-none">
+              <span id="micIcon" class="material-symbols-outlined text-5xl font-black text-black hover:text-slate-800 drop-shadow-[0_2px_6px_rgba(255,255,255,0.4)] selection:bg-transparent transition-colors duration-200">mic</span>
             </button>
           </div>
 
@@ -998,8 +1000,8 @@
 
           mediaRecorder.start();
           isRecording = true;
-          recordBtn.classList.remove("bg-red-600");
-          recordBtn.classList.add("bg-blue-600", "text-white");
+          micIcon.classList.remove("text-black", "hover:text-slate-800");
+          micIcon.classList.add("text-red-600", "animate-pulse");
           if (sttStatusText) sttStatusText.textContent = "SARVAM STT LISTENING...";
           micIcon.textContent = "stop";
         } catch (err) {
@@ -1008,8 +1010,8 @@
       } else {
         mediaRecorder.stop();
         isRecording = false;
-        recordBtn.classList.add("bg-red-600");
-        recordBtn.classList.remove("bg-blue-600", "text-white");
+        micIcon.classList.remove("text-red-600", "animate-pulse");
+        micIcon.classList.add("text-black", "hover:text-slate-800");
         if (sttStatusText) sttStatusText.textContent = "SARVAM STT TRANSCRIBING...";
         micIcon.textContent = "mic";
       }
@@ -1290,90 +1292,528 @@
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const maxR = Math.min(cx, cy) * 0.96;
-      const numSpokes = 8;
+      const numSpokes = 12;
       const numRings = 5;
 
-      // Fill inner background of starburst container with solid dark teal (#0a1e28)
-      ctx.fillStyle = "#0a1e28";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // 1. Fill Dark Forest Green (#053b22) Mask Background
+      ctx.fillStyle = "#053b22";
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+      ctx.fill();
 
-      // 1. Draw Spider Web Radial Spokes (Alternating Electric Cyan #00e5ff & Hot Pink #ff007f)
+      // Audio reactivity amplitude calculation
+      let audioGain = 0;
+      if (analyser && dataArray && isRecording) {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        audioGain = (sum / dataArray.length) / 255;
+      }
+
+      const greenStroke = isRecording ? "#00ffaa" : "#00ff66";
+
+      // 2. Draw Spider Web Radial Spokes (Green lines originating from central nose bridge)
+      ctx.strokeStyle = greenStroke;
+      ctx.lineWidth = 2.2;
       for (let i = 0; i < numSpokes; i++) {
         const angle = (i * Math.PI * 2) / numSpokes - Math.PI / 2;
         const x = cx + Math.cos(angle) * maxR;
         const y = cy + Math.sin(angle) * maxR;
         ctx.beginPath();
-        ctx.moveTo(cx, cy);
+        ctx.moveTo(cx, cy + 10);
         ctx.lineTo(x, y);
-        ctx.strokeStyle = isRecording 
-          ? "#ff007f" 
-          : (i % 2 === 0 ? "#00e5ff" : "#ff007f");
-        ctx.lineWidth = 2.2;
         ctx.stroke();
       }
 
-      // 2. Draw Concentric Spider Web Rings (Curved Geometric Spider Strands)
+      // 3. Draw Concentric Spider Web Arcs
       for (let r = 1; r <= numRings; r++) {
         const ringFraction = r / numRings;
-        const baseRadius = maxR * ringFraction;
+        const baseRadius = maxR * ringFraction + (audioGain * 14 * Math.sin(wavePhase + r));
 
-        ctx.beginPath();
-        ctx.strokeStyle = isRecording
-          ? `rgba(255, 0, 127, ${0.7 + r * 0.06})`
-          : (r % 2 === 0 ? `rgba(0, 229, 255, ${0.75 + r * 0.05})` : `rgba(255, 0, 127, ${0.75 + r * 0.05})`);
-        ctx.lineWidth = isRecording ? 2.5 : 2.0;
+        ctx.strokeStyle = isRecording 
+          ? `rgba(0, 255, 170, ${0.7 + r * 0.05})`
+          : `rgba(0, 255, 102, ${0.75 + r * 0.04})`;
+        ctx.lineWidth = isRecording ? 2.6 : 2.0;
 
         const ringPoints = [];
         for (let i = 0; i < numSpokes; i++) {
           const angle = (i * Math.PI * 2) / numSpokes - Math.PI / 2;
-          
-          let amp = Math.sin(angle * 4 + wavePhase + r) * 2.2;
-          if (analyser && dataArray && isRecording) {
-            analyser.getByteFrequencyData(dataArray);
-            const binIdx = Math.floor((i / numSpokes) * dataArray.length);
-            amp += (dataArray[binIdx] / 255) * 22 * ringFraction;
-          }
-
-          const currentR = baseRadius + amp;
-          const px = cx + Math.cos(angle) * currentR;
-          const py = cy + Math.sin(angle) * currentR;
+          const px = cx + Math.cos(angle) * baseRadius;
+          const py = cy + 10 + Math.sin(angle) * baseRadius;
           ringPoints.push({ x: px, y: py, angle: angle });
         }
 
-        // Draw curved spider web strands dipping inwards towards center
+        // Draw dipping spider web arcs
         for (let i = 0; i < numSpokes; i++) {
           const p1 = ringPoints[i];
           const p2 = ringPoints[(i + 1) % numSpokes];
-          
           const midAngle = (p1.angle + p2.angle) / 2 + (i === numSpokes - 1 ? Math.PI : 0);
           const dipRadius = baseRadius * 0.85;
           const midX = cx + Math.cos(midAngle) * dipRadius;
-          const midY = cy + Math.sin(midAngle) * dipRadius;
+          const midY = cy + 10 + Math.sin(midAngle) * dipRadius;
 
           ctx.beginPath();
           ctx.moveTo(p1.x, p1.y);
           ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
           ctx.stroke();
         }
-
-        // 3. Draw Spider Web Intersecting Node Dots (Bright Cyan & Hot Pink with Black Borders)
-        for (let idx = 0; idx < ringPoints.length; idx++) {
-          const pt = ringPoints[idx];
-          ctx.fillStyle = isRecording ? "#ff007f" : (idx % 2 === 0 ? "#00e5ff" : "#ff007f");
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, isRecording ? 4.5 : 3.8, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Black node stroke outline matching reference image
-          ctx.strokeStyle = "#000000";
-          ctx.lineWidth = 1.4;
-          ctx.stroke();
-        }
       }
+
+      // 4. Draw Thick Outer Green Spider-Man Circle Border
+      ctx.strokeStyle = greenStroke;
+      ctx.lineWidth = 6.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 5. Draw Iconic Spider-Man Angled Eyes (Symmetrical Left & Right with Thick Green Borders)
+      function drawSpiderEye(isLeft) {
+        const s = isLeft ? -1 : 1;
+        ctx.save();
+        ctx.beginPath();
+
+        // Eye anchor coordinates matching iconic Spider-Man mask geometry
+        const topInnerX = cx + s * (maxR * 0.08);
+        const topInnerY = cy - (maxR * 0.04);
+        const outerPointX = cx + s * (maxR * 0.72);
+        const outerPointY = cy - (maxR * 0.28);
+        const outerBottomX = cx + s * (maxR * 0.52);
+        const outerBottomY = cy + (maxR * 0.42);
+
+        ctx.moveTo(topInnerX, topInnerY);
+        // Slanted top edge outwards to outer sharp corner
+        ctx.quadraticCurveTo(cx + s * (maxR * 0.38), cy - (maxR * 0.34), outerPointX, outerPointY);
+        // Outer curve going down to bottom corner
+        ctx.quadraticCurveTo(cx + s * (maxR * 0.78), cy + (maxR * 0.08), outerBottomX, outerBottomY);
+        // Smooth bottom curve returning up to inner point
+        ctx.quadraticCurveTo(cx + s * (maxR * 0.22), cy + (maxR * 0.44), topInnerX, topInnerY);
+        ctx.closePath();
+
+        // Fill Eye with Solid Bright White
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+
+        // Thick Bold Black Eye Frame Stroke Outline
+        ctx.strokeStyle = "#000000";
+        ctx.lineWidth = 7.5;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      drawSpiderEye(true);  // Left Spider Eye
+      drawSpiderEye(false); // Right Spider Eye
 
       requestAnimationFrame(drawSpiderWeb);
     }
+
     drawSpiderWeb();
+
+    // ==========================================
+    // MAIN PAGE FULL-SCREEN IRON MAN FLIGHT ENGINE
+    // ==========================================
+    const mainCanvas = document.getElementById("ironmanMainCanvas");
+    const mainCtx = mainCanvas ? mainCanvas.getContext("2d") : null;
+
+    function resizeMainCanvas() {
+      if (mainCanvas) {
+        mainCanvas.width = window.innerWidth;
+        mainCanvas.height = window.innerHeight;
+      }
+    }
+    window.addEventListener("resize", resizeMainCanvas);
+    resizeMainCanvas();
+
+    const mainIronmanImg = new Image();
+    mainIronmanImg.src = "/ironman.png";
+    let mainIronmanLoaded = false;
+    mainIronmanImg.onload = () => { mainIronmanLoaded = true; };
+
+    let mainImX = -220;
+    const mainThrusterParticles = [];
+
+    function drawMainPageIronMan() {
+      if (!mainCanvas || !mainCtx) return;
+
+      const w = mainCanvas.width;
+      const h = mainCanvas.height;
+      mainCtx.clearRect(0, 0, w, h);
+
+      // High-Speed Avengers Triangle / V-Formation Motion Engine (Speed = 5.6px/frame)
+      const flightSpeed = 5.6;
+      mainImX += flightSpeed;
+      if (mainImX > w + 450) mainImX = -450;
+
+      // Base Straight Diagonal Trajectory for Formation Leader (Iron Man at point of Triangle)
+      const progress = (mainImX + 450) / (w + 900);
+      const baseLeaderY = (h * 0.82) - progress * (h * 0.68);
+      const mainImY = baseLeaderY;
+
+      const imW = 165;
+      const imH = 245;
+
+      const bootX = mainImX + imW * 0.16;
+      const bootY = mainImY + imH * 0.86;
+      const handX = mainImX + imW * 0.30;
+      const handY = mainImY + imH * 0.48;
+
+      let boostPulse = Math.sin(wavePhase * 8) * 6;
+      if (analyser && dataArray && isRecording) {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < 8; i++) sum += dataArray[i];
+        boostPulse += (sum / 8) * 0.25;
+      }
+
+      // Helper for MCU booster flame on main page
+      function drawMainBoosterFlame(x, y, angle, length, width) {
+        mainCtx.save();
+        mainCtx.translate(x, y);
+        mainCtx.rotate(angle);
+
+        // Outer Sky Blue Plasma Booster Flame
+        const flameGrad = mainCtx.createLinearGradient(0, 0, length, 0);
+        flameGrad.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+        flameGrad.addColorStop(0.2, "rgba(135, 206, 250, 0.95)");
+        flameGrad.addColorStop(0.5, "rgba(0, 191, 255, 0.9)");
+        flameGrad.addColorStop(0.8, "rgba(0, 119, 255, 0.65)");
+        flameGrad.addColorStop(1, "rgba(0, 80, 255, 0)");
+
+        mainCtx.beginPath();
+        mainCtx.moveTo(0, -width / 2);
+        mainCtx.lineTo(length + boostPulse, 0);
+        mainCtx.lineTo(0, width / 2);
+        mainCtx.closePath();
+        mainCtx.fillStyle = flameGrad;
+        mainCtx.fill();
+
+        // Inner Pure White & Ice Blue Core Jet
+        const coreGrad = mainCtx.createLinearGradient(0, 0, length * 0.65, 0);
+        coreGrad.addColorStop(0, "#ffffff");
+        coreGrad.addColorStop(0.5, "#e0f7ff");
+        coreGrad.addColorStop(0.85, "#00bfff");
+        coreGrad.addColorStop(1, "rgba(0, 191, 255, 0)");
+
+        mainCtx.beginPath();
+        mainCtx.moveTo(0, -width * 0.25);
+        mainCtx.lineTo(length * 0.6 + boostPulse * 0.5, 0);
+        mainCtx.lineTo(0, width * 0.25);
+        mainCtx.closePath();
+        mainCtx.fillStyle = coreGrad;
+        mainCtx.fill();
+
+        mainCtx.restore();
+      }
+
+      // Draw main booster flames under boots & hands
+      drawMainBoosterFlame(bootX, bootY, Math.PI * 0.82, 65 + boostPulse, 22);
+      drawMainBoosterFlame(handX, handY, Math.PI * 0.84, 45 + boostPulse, 16);
+
+      // Spawn Sky Blue thruster spark particles on main page
+      for (let p = 0; p < 5; p++) {
+        const origin = Math.random() > 0.5 ? { x: bootX, y: bootY } : { x: handX, y: handY };
+        mainThrusterParticles.push({
+          x: origin.x,
+          y: origin.y,
+          vx: -(2.5 + Math.random() * 4.5),
+          vy: 1.2 + (Math.random() - 0.5) * 3,
+          radius: 2.0 + Math.random() * 3.5,
+          color: Math.random() > 0.4 ? "#00bfff" : (Math.random() > 0.5 ? "#87cefa" : "#ffffff"),
+          life: 1.0,
+          decay: 0.02 + Math.random() * 0.03
+        });
+      }
+
+      // Update & render main thruster particles
+      for (let i = mainThrusterParticles.length - 1; i >= 0; i--) {
+        const pt = mainThrusterParticles[i];
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= pt.decay;
+
+        if (pt.life <= 0) {
+          mainThrusterParticles.splice(i, 1);
+          continue;
+        }
+
+        mainCtx.save();
+        mainCtx.globalAlpha = pt.life;
+        mainCtx.fillStyle = pt.color;
+        mainCtx.shadowColor = pt.color;
+        mainCtx.shadowBlur = 10;
+        mainCtx.beginPath();
+        mainCtx.arc(pt.x, pt.y, pt.radius * pt.life, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      // Draw Bright Glowing Iron Man sprite on main page
+      if (mainIronmanLoaded) {
+        mainCtx.save();
+        mainCtx.filter = "brightness(1.45) contrast(1.3) saturate(1.35) drop-shadow(0 0 22px rgba(0, 220, 255, 0.95))";
+        mainCtx.drawImage(mainIronmanImg, mainImX, mainImY, imW, imH);
+        mainCtx.restore();
+
+        // Chest Arc Reactor Energy Glow Lens Flare
+        const chestX = mainImX + imW * 0.84;
+        const chestY = mainImY + imH * 0.35;
+        mainCtx.save();
+        const arcGrad = mainCtx.createRadialGradient(chestX, chestY, 0, chestX, chestY, 16);
+        arcGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
+        arcGrad.addColorStop(0.4, "rgba(0, 240, 255, 0.9)");
+        arcGrad.addColorStop(1, "rgba(0, 240, 255, 0)");
+        mainCtx.fillStyle = arcGrad;
+        mainCtx.beginPath();
+        mainCtx.arc(chestX, chestY, 16, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      // ==========================================
+      // DRAW THOR FLYING UPWARD (Top Wing of Triangle Formation)
+      // ==========================================
+      const thorX = mainImX - 220;
+      const thorY = baseLeaderY - 95;
+
+      const thorW = 180;
+      const thorH = 240;
+
+      // Stormbreaker Axe & Body Anchor Points
+      const axeX = thorX + thorW * 0.42;
+      const axeY = thorY + thorH * 0.22;
+      const headX = thorX + thorW * 0.65;
+      const headY = thorY + thorH * 0.38;
+      const footX = thorX + thorW * 0.45;
+      const footY = thorY + thorH * 0.88;
+
+      // 1. Draw Crackling Lightning Bolts from Stormbreaker
+      const numBolts = (analyser && dataArray && isRecording) ? 8 : 5;
+      for (let b = 0; b < numBolts; b++) {
+        const targetAngle = Math.random() * Math.PI * 2;
+        const boltLength = 30 + Math.random() * 60;
+        const endX = axeX + Math.cos(targetAngle) * boltLength;
+        const endY = axeY + Math.sin(targetAngle) * boltLength;
+        drawLightningArc(mainCtx, axeX, axeY, endX, endY, 12);
+      }
+
+      // Lightning arcs crackling across armor & cape
+      drawLightningArc(mainCtx, axeX, axeY, headX, headY, 10);
+      drawLightningArc(mainCtx, axeX, axeY, footX, footY, 14);
+
+      // 2. Spawn Electric Thunder Spark Particles
+      for (let s = 0; s < 4; s++) {
+        thorSparks.push({
+          x: axeX + (Math.random() - 0.5) * 30,
+          y: axeY + (Math.random() - 0.5) * 30,
+          vx: -(2.0 + Math.random() * 4.0),
+          vy: (Math.random() - 0.5) * 3.5,
+          radius: 1.5 + Math.random() * 3.0,
+          color: Math.random() > 0.4 ? "#00e5ff" : "#ffffff",
+          life: 1.0,
+          decay: 0.03 + Math.random() * 0.04
+        });
+      }
+
+      // Update & render Thor electric sparks
+      for (let i = thorSparks.length - 1; i >= 0; i--) {
+        const sp = thorSparks[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.life -= sp.decay;
+        if (sp.life <= 0) {
+          thorSparks.splice(i, 1);
+          continue;
+        }
+
+        mainCtx.save();
+        mainCtx.globalAlpha = sp.life;
+        mainCtx.fillStyle = sp.color;
+        mainCtx.shadowColor = "#00e5ff";
+        mainCtx.shadowBlur = 10;
+        mainCtx.beginPath();
+        mainCtx.arc(sp.x, sp.y, sp.radius * sp.life, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      // 3. Draw Bright Luminous Thor Sprite with Electric Aura
+      if (thorLoaded) {
+        mainCtx.save();
+        mainCtx.filter = "brightness(1.4) contrast(1.28) saturate(1.3) drop-shadow(0 0 24px rgba(0, 229, 255, 0.95))";
+        mainCtx.drawImage(thorImg, thorX, thorY, thorW, thorH);
+        mainCtx.restore();
+
+        // Stormbreaker Radial Thunder Glow Flare
+        mainCtx.save();
+        const stormGrad = mainCtx.createRadialGradient(axeX, axeY, 0, axeX, axeY, 28);
+        stormGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
+        stormGrad.addColorStop(0.35, "rgba(0, 229, 255, 0.9)");
+        stormGrad.addColorStop(1, "rgba(0, 229, 255, 0)");
+        mainCtx.fillStyle = stormGrad;
+        mainCtx.beginPath();
+        mainCtx.arc(axeX, axeY, 28, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      // ==========================================
+      // DRAW CAPTAIN AMERICA FLYING UPWARD (Bottom Wing of Triangle Formation)
+      // ==========================================
+      const capX = mainImX - 220;
+      const capY = baseLeaderY + 95;
+
+      const capW = 165;
+      const capH = 240;
+
+      // Mjolnir Hammer (Right Hand), Shield (Left Hand), Chest & Feet Anchors
+      const mjolnirX = capX + capW * 0.12;
+      const mjolnirY = capY + capH * 0.44;
+      const shieldX = capX + capW * 0.85;
+      const shieldY = capY + capH * 0.18;
+      const capChestX = capX + capW * 0.46;
+      const capChestY = capY + capH * 0.36;
+
+      // 1. Draw Crackling Lightning Bolts from Mjolnir Hammer in Cap's Hand
+      const capBolts = (analyser && dataArray && isRecording) ? 7 : 4;
+      for (let b = 0; b < capBolts; b++) {
+        const targetAngle = Math.random() * Math.PI * 2;
+        const boltLength = 25 + Math.random() * 55;
+        const endX = mjolnirX + Math.cos(targetAngle) * boltLength;
+        const endY = mjolnirY + Math.sin(targetAngle) * boltLength;
+        drawLightningArc(mainCtx, mjolnirX, mjolnirY, endX, endY, 11);
+      }
+
+      // Crackle from Mjolnir across right arm to Chest Star and up to Shield
+      drawLightningArc(mainCtx, mjolnirX, mjolnirY, capChestX, capChestY, 10);
+      drawLightningArc(mainCtx, mjolnirX, mjolnirY, shieldX, shieldY, 13);
+
+      // 2. Spawn Electric Thunder Spark Particles from Mjolnir Hand
+      for (let s = 0; s < 4; s++) {
+        capSparks.push({
+          x: mjolnirX + (Math.random() - 0.5) * 24,
+          y: mjolnirY + (Math.random() - 0.5) * 24,
+          vx: -(2.0 + Math.random() * 3.8),
+          vy: (Math.random() - 0.5) * 3.2,
+          radius: 1.4 + Math.random() * 2.8,
+          color: Math.random() > 0.4 ? "#00e5ff" : "#ffffff",
+          life: 1.0,
+          decay: 0.03 + Math.random() * 0.04
+        });
+      }
+
+      // Render Cap's hand electric sparks
+      for (let i = capSparks.length - 1; i >= 0; i--) {
+        const sp = capSparks[i];
+        sp.x += sp.vx;
+        sp.y += sp.vy;
+        sp.life -= sp.decay;
+        if (sp.life <= 0) {
+          capSparks.splice(i, 1);
+          continue;
+        }
+
+        mainCtx.save();
+        mainCtx.globalAlpha = sp.life;
+        mainCtx.fillStyle = sp.color;
+        mainCtx.shadowColor = "#00e5ff";
+        mainCtx.shadowBlur = 10;
+        mainCtx.beginPath();
+        mainCtx.arc(sp.x, sp.y, sp.radius * sp.life, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      // 3. Draw Luminous Captain America Sprite with Electric Aura & Mjolnir Flare
+      if (capLoaded) {
+        mainCtx.save();
+        mainCtx.filter = "brightness(1.42) contrast(1.3) saturate(1.35) drop-shadow(0 0 22px rgba(0, 229, 255, 0.95))";
+        mainCtx.drawImage(capImg, capX, capY, capW, capH);
+        mainCtx.restore();
+
+        // Mjolnir Hand Thunder Glow Lens Flare
+        mainCtx.save();
+        const mjolnirGrad = mainCtx.createRadialGradient(mjolnirX, mjolnirY, 0, mjolnirX, mjolnirY, 26);
+        mjolnirGrad.addColorStop(0, "rgba(255, 255, 255, 1)");
+        mjolnirGrad.addColorStop(0.35, "rgba(0, 229, 255, 0.9)");
+        mjolnirGrad.addColorStop(1, "rgba(0, 229, 255, 0)");
+        mainCtx.fillStyle = mjolnirGrad;
+        mainCtx.beginPath();
+        mainCtx.arc(mjolnirX, mjolnirY, 26, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+
+        // Shield Reflection Electric Sparkle
+        mainCtx.save();
+        const shieldGrad = mainCtx.createRadialGradient(shieldX, shieldY, 0, shieldX, shieldY, 20);
+        shieldGrad.addColorStop(0, "rgba(255, 255, 255, 0.9)");
+        shieldGrad.addColorStop(0.4, "rgba(0, 229, 255, 0.6)");
+        shieldGrad.addColorStop(1, "rgba(0, 229, 255, 0)");
+        mainCtx.fillStyle = shieldGrad;
+        mainCtx.beginPath();
+        mainCtx.arc(shieldX, shieldY, 20, 0, Math.PI * 2);
+        mainCtx.fill();
+        mainCtx.restore();
+      }
+
+      requestAnimationFrame(drawMainPageIronMan);
+    }
+
+    // Captain America Sprite Loader
+    const capImg = new Image();
+    capImg.src = "/cap.png";
+    let capLoaded = false;
+    capImg.onload = () => { capLoaded = true; };
+
+    let capX = -650;
+    const capSparks = [];
+
+    // Thor Sprite & Lightning Helper
+    const thorImg = new Image();
+    thorImg.src = "/thor.png";
+    let thorLoaded = false;
+    thorImg.onload = () => { thorLoaded = true; };
+
+    let thorX = -450;
+    const thorSparks = [];
+
+    function drawLightningArc(c, x1, y1, x2, y2, roughness = 14) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const dist = Math.hypot(dx, dy);
+      const steps = Math.max(4, Math.floor(dist / 14));
+      
+      c.beginPath();
+      c.moveTo(x1, y1);
+      let curX = x1;
+      let curY = y1;
+      
+      for (let i = 1; i < steps; i++) {
+        const t = i / steps;
+        const targetX = x1 + dx * t;
+        const targetY = y1 + dy * t;
+        const offset = (Math.random() - 0.5) * roughness;
+        const nx = -dy / (dist || 1);
+        const ny = dx / (dist || 1);
+        curX = targetX + nx * offset;
+        curY = targetY + ny * offset;
+        c.lineTo(curX, curY);
+      }
+      c.lineTo(x2, y2);
+
+      c.save();
+      c.strokeStyle = "rgba(0, 229, 255, 0.95)";
+      c.lineWidth = 3.5;
+      c.shadowColor = "#00e5ff";
+      c.shadowBlur = 16;
+      c.stroke();
+
+      c.strokeStyle = "#ffffff";
+      c.lineWidth = 1.6;
+      c.stroke();
+      c.restore();
+    }
+
+    drawMainPageIronMan();
   </script>
 </body>
 </html>

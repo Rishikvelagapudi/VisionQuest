@@ -1,0 +1,48 @@
+"""
+Comprehensive Movies, Cast, Directors, IMDb Ratings, and Storylines Dataset for Hollywood, Bollywood, Tollywood, and Marathi Cinema.
+"""
+
+EN_MOVIE_PASSAGES = [
+    ("en_p_mov_001", "Inception (2010, IMDb: 8.8) is a sci-fi thriller directed by Christopher Nolan, starring Leonardo DiCaprio as Dom Cobb, Joseph Gordon-Levitt, and Elliot Page. Dom Cobb is a thief who steals corporate secrets by entering dreams, and is tasked with planting an idea into a CEO's subconscious mind (inception).", 701, 1),
+    ("en_p_mov_002", "The Dark Knight (2008, IMDb: 9.0) is a superhero film directed by Christopher Nolan, starring Christian Bale as Bruce Wayne / Batman and Heath Ledger as the Joker. Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice when the Joker unleashes chaos on Gotham City.", 702, 1),
+    ("en_p_mov_003", "Oppenheimer (2023, IMDb: 8.9) is a biographical drama directed by Christopher Nolan, starring Cillian Murphy as J. Robert Oppenheimer, Emily Blunt, Matt Damon, and Robert Downey Jr. The film chronicles Oppenheimer's leadership of the Manhattan Project at Los Alamos and the development of the atomic bomb.", 703, 1),
+    ("en_p_mov_004", "Interstellar (2014, IMDb: 8.7) is a space epic directed by Christopher Nolan, starring Matthew McConaughey, Anne Hathaway, and Jessica Chastain. When Earth becomes uninhabitable, a team of ex-NASA astronauts travels through a wormhole near Saturn in search of a new habitable planet for humanity.", 704, 1),
+    ("en_p_mov_005", "Titanic (1997, IMDb: 7.9) is an epic romance and disaster film directed by James Cameron, starring Leonardo DiCaprio as Jack Dawson and Kate Winslet as Rose DeWitt Bukater. A seventeen-year-old aristocrat falls in love with a poor artist aboard the luxurious, ill-fated R.M.S. Titanic.", 705, 1),
+    ("en_p_mov_006", "The Godfather (1972, IMDb: 9.2) is a crime masterpiece directed by Francis Ford Coppola, starring Marlon Brando as Vito Corleone and Al Pacino as Michael Corleone. The story follows the aging patriarch of an Italian-American organized crime dynasty transferring control of his empire to his reluctant son.", 706, 1),
+    ("en_p_mov_007", "Hollywood top actors list includes Leonardo DiCaprio, Robert De Niro, Tom Cruise, Meryl Streep, Scarlett Johansson, Cillian Murphy, Christian Bale, Brad Pitt, and Morgan Freeman, working with renowned directors like Steven Spielberg, Christopher Nolan, and Quentin Tarantino.", 707, 1),
+    ("en_p_mov_008", "Baahubali: The Beginning (2015, IMDb: 8.0) and Baahubali 2: The Conclusion (2017, IMDb: 8.2) are epic Telugu fantasy action films directed by S.S. Rajamouli, starring Prabhas as Amarendra & Mahendra Baahubali, Rana Daggubati, Anushka Shetty, and Ramya Krishnan. An adventurous prince learns about his royal lineage and seeks revenge against a tyrant king.", 708, 1),
+    ("en_p_mov_009", "RRR (2022, IMDb: 7.8) is a global blockbuster directed by S.S. Rajamouli, starring Ram Charan as Alluri Sitarama Raju and Jr NTR as Komaram Bheem, with Oscar-winning music by M.M. Keeravani for Naatu Naatu. Two 1920s Indian revolutionaries fight against British colonial oppressors.", 709, 1),
+    ("en_p_mov_010", "Pushpa: The Rise (2021, IMDb: 7.6) and Pushpa 2: The Rule are Telugu action thrillers directed by Sukumar, starring Allu Arjun as Pushpa Raj, Rashmika Mandanna, and Fahadh Faasil. A coolie rises through the ranks of a red sandalwood smuggling syndicate in Andhra Pradesh.", 710, 1),
+]
+
+HI_MOVIE_PASSAGES = [
+    ("hi_p_mov_001", "शोले (1975, IMDb: 8.1) रमेश सिप्पी द्वारा निर्देशित एक क्लासिक बॉलीवुड एक्शन फिल्म है, जिसमें अमिताभ बच्चन (जय), धर्मेंद्र (वीरू), संजीव कुमार (ठाकुर) और अमजद खान (गब्बर सिंह) ने अभिनय किया है। एक पूर्व पुलिस अधिकारी ठाकुर खूंखार डाकू गब्बर को पकड़ने के लिए दो पूर्व-कैदियों वीरू और जय को काम पर रखता है।", 801, 1),
+    ("hi_p_mov_002", "दिलवाले दुल्हनिया ले जाएंगे (DDLJ) (1995, IMDb: 8.0) आदित्य चोपड़ा द्वारा निर्देशित रोमांटिक फिल्म है, जिसमें शाह रुख खान (राज) और काजोल (सिमरन) मुख्य भूमिका में हैं। यूरोप की यात्रा में राज और सिमरन को प्यार हो जाता है, लेकिन शादी के लिए राज को पंजाब जाकर सिमरन के सख्त पिता का दिल जीतना पड़ता है।", 802, 1),
+    ("hi_p_mov_003", "3 इडियट्स (2009, IMDb: 8.4) राजकुमार हिरानी द्वारा निर्देशित कॉमेडी-ड्रामा है, जिसमें आमिर खान (रेंचो), आर माधवन (फरहान), शरमन जोशी (राजू) और करीना कपूर शामिल हैं। दो दोस्त अपने लापता कॉलेज साथी रेंचो को ढूंढते हुए शिक्षा प्रणाली और जुनून पर उसके क्रांतिकारी विचारों को याद करते हैं।", 803, 1),
+    ("hi_p_mov_004", "दंगल (2016, IMDb: 8.3) नितेश तिवारी द्वारा निर्देशित बायोग्राफिकल स्पोर्ट्स ड्रामा है, जिसमें आमिर खान (महावीर सिंह फोगाट), फातिमा सना शेख (गीता) और सान्या मल्होत्रा (बबीता) ने काम किया है। एक पूर्व पहलवान अपनी बेटियों को विश्वस्तरीय स्वर्ण पदक विजेता पहलवान बनाने के लिए प्रशिक्षित करता है।", 804, 1),
+    ("hi_p_mov_005", "जवान और पठान (2023, IMDb: 7.0+) एटली और सिद्धार्थ आनंद द्वारा निर्देशित और शाह रुख खान, दीपिका पादुकोण और जॉन अब्राहम अभिनीत ब्लॉकबस्टर एक्शन फिल्में हैं, जो देशभक्ति, खुफिया मिशन और सामाजिक न्याय पर आधारित हैं।", 805, 1),
+    ("hi_p_mov_006", "स्वदेश (2004, IMDb: 8.2) आशुतोष गोवारिकर द्वारा निर्देशित फिल्म है, जिसमें शाह रुख खान (मोहन भार्गव) ने नासा के वैज्ञानिक की भूमिका निभाई है जो अपने भारतीय गांव लौटकर बिजली उत्पादन और सामाजिक बदलाव लाता है।", 806, 1),
+    ("hi_p_mov_007", "बॉलीवुड के शीर्ष अभिनेताओं में अमिताभ बच्चन, शाह रुख खान, आमिर खान, सलमान खान, रणबीर कपूर, ऋतिक रोशन, दीपिका पादुकोण और आलिया भट्ट शामिल हैं, जिन्होंने यश चोपड़ा, संजय लीला भंसाली और राजकुमार हिरानी जैसे निर्देशकों के साथ काम किया है।", 807, 1),
+    ("hi_p_mov_008", "टॉलीवुड (तेलुगु सिनेमा) की बाहुबली श्रृंखला (IMDb: 8.2) और RRR (IMDb: 7.8) एस. एस. राजामौली द्वारा निर्देशित फिल्में हैं, जिनमें प्रभास, राम चरण, जूनियर एनटीआर, राणा दग्गुबाती और अनुष्का शेट्टी ने अभिनय किया है। RRR के गाने 'नाटू नाटू' ने सर्वश्रेष्ठ मूल गीत का ऑस्कर जीता।", 808, 1),
+]
+
+MR_MOVIE_PASSAGES = [
+    ("mr_p_mov_001", "सैराट (2016, IMDb: 8.3) नागराज मंजुळे दिग्दर्शित मराठी रोमँटिक ड्रामा आहे, ज्यामध्ये रिंकू राजगुरू (आर्ची) आणि आकाश ठोसर (परशा) यांनी अभिनय केला आहे. महाराष्ट्रातील ग्रामीण पार्श्वभूमीवर जातीव्यवस्थेच्या भिंती ओलांडून प्रेमाचा शोध घेणारी ही ब्लॉकबस्टर चित्रपट आहे.", 901, 1),
+    ("mr_p_mov_002", "नटसम्राट (2016, IMDb: 8.8) महेश मांजरेकर दिग्दर्शित ड्रामा आहे, ज्यामध्ये नाना पाटेकर यांनी अप्पासाहेब बेलवलकर या सेवानिवृत्त रंगभूमी कलाकाराची अजरामर भूमिका केली आहे. मुलांच्या दुर्लक्षामुळे उद्भवलेला कौटुंबिक संघर्ष यात दाखवला आहे.", 902, 1),
+    ("mr_p_mov_003", "पावनखिंड (2022, IMDb: 8.2) आणि फर्जंद दिग्पाल लांजेकर दिग्दर्शित ऐतिहासिक पट आहेत, ज्यामध्ये चिन्मय मांडलेकर (छत्रपती शिवाजी महाराज) आणि अजय पूरकर (बाजीप्रभू देशपांडे) यांनी अभिनय केला आहे. बाजीप्रभू देशपांडे यांच्या पराक्रमाची गाथा यात मांडली आहे.", 903, 1),
+    ("mr_p_mov_004", "कट्यार काळजात घुसली (2015, IMDb: 8.6) सुबोध भावे दिग्दर्शित संगीतमय चित्रपट आहे, ज्यामध्ये पंडित जितेन्द्र अभिषेकी यांच्या संगीतावर आधारित सचिन पिळगावकर आणि शंकर महादेवन यांनी शास्त्रीय गायकांची जुगलबंदी सादर केली आहे.", 904, 1),
+    ("mr_p_mov_005", "मराठी चित्रपटसृष्टीतील प्रमुख कलाकारांमध्ये अशोक सराफ, लक्ष्मीकांत बेर्डे, सचिन पिळगावकर, नाना पाटेकर, सुबोध भावे, सई ताम्हणकर, मुक्ता बर्वे आणि अंकुश चौधरी यांचा समावेश आहे. दादासाहेब फाळके यांनी १९१३ मध्ये 'राजा हरिश्चंद्र' चित्रपटाने भारतीय सिनेमाची पायाभरणी केली.", 905, 1),
+]
+
+MOVIE_LONGDOCS = {
+    "en": [
+        {"doc_id": "en_mov_ld_01", "title": "Hollywood Cinema, Directors, and Classics", "text": "Hollywood is the historical center of global cinema. Renowned directors like Christopher Nolan (Inception, The Dark Knight, Oppenheimer, Interstellar), James Cameron (Avatar, Titanic), Steven Spielberg (Jurassic Park, Schindler's List), and Francis Ford Coppola (The Godfather) have created cinematic masterpieces. Leading actors such as Leonardo DiCaprio, Robert De Niro, Al Pacino, Christian Bale, Tom Cruise, Meryl Streep, and Cillian Murphy consistently deliver Oscar-winning performances across action, sci-fi, and drama genres.", "source_lang": "en"},
+        {"doc_id": "en_mov_ld_02", "title": "Indian Cinema: Bollywood & Tollywood Pan-India Revolution", "text": "Indian cinema is a multi-billion dollar film ecosystem. Bollywood (Hindi cinema) features legendary stars like Shah Rukh Khan (DDLJ, Swades, Jawan, Pathaan), Amitabh Bachchan (Sholay), and Aamir Khan (3 Idiots, Dangal). Tollywood (Telugu cinema) has spearheaded the pan-India cinema movement under director S.S. Rajamouli with Baahubali and RRR (featuring Oscar-winning music Naatu Naatu by M.M. Keeravani), alongside superstars like Prabhas, Ram Charan, Jr NTR, and Allu Arjun (Pushpa).", "source_lang": "en"},
+    ],
+    "hi": [
+        {"doc_id": "hi_mov_ld_01", "title": "बॉलीवुड, टॉलीवुड और हॉलीवुड सिनेमा गाइड", "text": "बॉलीवुड में शोले, दिलवाले दुल्हनिया ले जाएंगे, 3 इडियट्स और दंगल जैसी फिल्मों ने बॉक्स ऑफिस के रिकॉर्ड तोड़े हैं। अमिताभ बच्चन, शाह रुख खान और आमिर खान हिंदी सिनेमा के प्रमुख स्तंभ हैं। टॉलीवुड में एस. एस. राजामौली की बाहुबली और RRR ने प्रभास, राम चरण और जूनियर एनटीआर के साथ वैश्विक स्तर पर पहचान बनाई। हॉलीवुड में क्रिस्टोफर नोलन की इनसेप्शन, द डार्क नाइट और ओपेनहाइमर में लियोनार्डो डिकैप्रियो और किलियन मर्फी ने शानदार अभिनय किया है।", "source_lang": "hi"},
+    ],
+    "mr": [
+        {"doc_id": "mr_mov_ld_01", "title": "मराठी, बॉलिवूड आणि टॉलीवुड चित्रपट माहिती", "text": "दादासाहेब फाळके यांनी १९१३ मध्ये भारतीय चित्रपटसृष्टीची पायाभरणी केली. मराठी सिनेमात नटसम्राट, सैराट, पावनखिंड आणि कट्यार काळजात घुसली हे ऐतिहासिक व दर्जेदार चित्रपट आहेत. अशोक सराफ, नाना पाटेकर, सुबोध भावे आणि सचिन पिळगावकर यांनी मराठी नाट्य व चित्रपटसृष्टी समृद्ध केली आहे.", "source_lang": "mr"},
+    ],
+}
