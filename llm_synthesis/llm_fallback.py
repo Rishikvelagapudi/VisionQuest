@@ -107,12 +107,12 @@ class LLMAdapter:
         if not config.ALLOW_NETWORK_CALLS_IN_PIPELINE:
             return self._local_fallback_synthesize(prompt, context)
 
-        # Tier 1: Primary LLM (Groq Llama-3.3 / OpenAI-compatible)
+        # Tier 1: Primary LLM (Groq / OpenAI-compatible)
         if self.api_key and self.api_key.strip():
             # Try configured Groq model with ultra-fast fallbacks on 429
             primary_models = [self.model]
-            if "groq.com" in self.base_url or "llama" in self.model.lower() or "groq" in self.model.lower():
-                for alt_m in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "llama3-70b-8192"]:
+            if "groq.com" in self.base_url or "groq" in self.model.lower() or "gpt-oss" in self.model.lower() or "qwen" in self.model.lower():
+                for alt_m in ["openai/gpt-oss-120b", "qwen/qwen3.6-27b", "groq/compound", "openai/gpt-oss-20b"]:
                     if alt_m not in primary_models:
                         primary_models.append(alt_m)
                 

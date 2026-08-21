@@ -191,11 +191,11 @@ DYNAMIC_SEMANTIC_CACHE_ENABLED = os.getenv("DYNAMIC_SEMANTIC_CACHE_ENABLED", "tr
 DYNAMIC_SEMANTIC_CACHE_MAX_ENTRIES = int(os.getenv("DYNAMIC_SEMANTIC_CACHE_MAX_ENTRIES", "2048"))
 DYNAMIC_SEMANTIC_CACHE_THRESHOLD = float(os.getenv("DYNAMIC_SEMANTIC_CACHE_THRESHOLD", "0.92"))
 
-# Tier-1 Primary: Groq High-Speed Llama-3.3 / Mixtral API (~150ms)
+# Tier-1 Primary: Groq High-Speed Llama-3.3 / Mixtral / GPT-OSS API (~150ms)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", os.getenv("LLM_API_KEY", ""))
 LLM_API_KEY = os.getenv("LLM_API_KEY", GROQ_API_KEY)
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://api.groq.com/openai/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama-3.3-70b-versatile")
+LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 LLM_TIMEOUT_SECONDS = 15.0
 
 # Tier-2 & Tier-3 Backup: Cerebras High-Speed LPU (120B model for high instruction following)
