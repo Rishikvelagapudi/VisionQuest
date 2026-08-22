@@ -1,3 +1,13 @@
+---
+title: VECTOR VisionQuest
+emoji: 🚀
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # ⚡ VECTOR: Voice-Enabled Multilingual Indic RAG Engine
 
 <div align="center">
