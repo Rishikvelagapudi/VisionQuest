@@ -170,7 +170,7 @@ MIN_CONFIDENT_MATCH_SCORE = float(os.getenv("MIN_CONFIDENT_MATCH_SCORE", "0.35")
 GROUNDING_OVERLAP_THRESHOLD = 0.30
 
 # Meta Prompt-Guard 86M Sub-10ms Neural Safety & Indirect Prompt Injection Guardrail
-ENABLE_PROMPT_GUARD = os.getenv("ENABLE_PROMPT_GUARD", "true").lower() == "true"
+ENABLE_PROMPT_GUARD = os.getenv("ENABLE_PROMPT_GUARD", "false").lower() == "true"
 PROMPT_GUARD_MODEL_NAME = os.getenv("PROMPT_GUARD_MODEL_NAME", "meta-llama/Prompt-Guard-86M")
 PROMPT_GUARD_ONNX_REPO = os.getenv("PROMPT_GUARD_ONNX_REPO", "prompt-security/Prompt-Guard-86M_onnx")
 PROMPT_GUARD_ONNX_PATH = ONNX_MODELS_DIR / "prompt_guard_86m.onnx"
