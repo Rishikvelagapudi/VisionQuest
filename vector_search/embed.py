@@ -190,6 +190,9 @@ class PyTorchMultilingualE5Embedder:
     PyTorch fallback wrapper for sentence-transformers multilingual-e5-small.
     """
     def __init__(self, model_name: str = config.EMBEDDING_MODEL_NAME):
+        import torch
+        torch.set_grad_enabled(False)
+        torch.set_num_threads(1)
         from sentence_transformers import SentenceTransformer
         logger.info(f"Loading PyTorch fallback embedding model: '{model_name}'...")
         self.model_name = model_name
@@ -197,6 +200,7 @@ class PyTorchMultilingualE5Embedder:
             self.model = SentenceTransformer(model_name, local_files_only=True)
         except Exception:
             self.model = SentenceTransformer(model_name)
+        self.model.eval()
         self.dim = config.EMBEDDING_DIM
         logger.info(f"PyTorch embedding model loaded (dim={self.dim}).")
 
