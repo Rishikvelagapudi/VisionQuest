@@ -88,13 +88,7 @@ app.add_middleware(
 # Preload models and perform full pipeline warmup asynchronously at startup
 @app.on_event("startup")
 async def startup_event():
-    async def run_warmup():
-        print("[Space Startup] Preloading embedding model, FAISS indexes, and warming up pipeline...")
-        orchestrator = get_orchestrator()
-        await asyncio.to_thread(orchestrator.warmup_pipeline)
-        print("[Space Startup] Full RAG pipeline preloaded and warmed up successfully.")
-    
-    asyncio.create_task(run_warmup())
+    print("[Space Startup] Server process started cleanly. Listening for connections...")
 
 
 @app.get("/", response_class=HTMLResponse)
