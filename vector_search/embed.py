@@ -12,16 +12,9 @@ import os
 from pathlib import Path
 from typing import List, Union
 import numpy as np
-import torch
 import config
 
 logger = logging.getLogger(__name__)
-
-# Optimize PyTorch CPU parallelism
-try:
-    torch.set_num_threads(max(1, torch.get_num_threads()))
-except Exception:
-    pass
 
 _EMBEDDER_INSTANCE = None
 
