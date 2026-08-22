@@ -17,9 +17,11 @@ pinned: false
 [![FAISS Sub-10ms](https://img.shields.io/badge/FAISS-Sub--10ms_Latency-brightgreen?style=flat)](https://github.com/facebookresearch/faiss)
 [![SLA Pass Rate](https://img.shields.io/badge/SLA_Pass_Rate-100%25-success?style=flat)](#2-cold-start-multilingual-sla-benchmark-15-languages)
 [![Indic Languages](https://img.shields.io/badge/Languages-15_Indic_%2B_EN-blue?style=flat)](#-language-extensibility-matrix)
-[![Docker SDK](https://img.shields.io/badge/Docker-HF_Spaces-2496ED?style=flat&logo=docker&logoColor=white)](#-hugging-face-space-deployment)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Active-brightgreen?style=for-the-badge&logo=fastapi)](https://hungry-games-dance.loca.lt/)
 
 **An instrumented, ultra-low-latency, voice-enabled Retrieval-Augmented Generation (RAG) engine built from scratch for 15 Indic languages.**
+
+> 🌐 **Live Deployed Application**: [https://hungry-games-dance.loca.lt](https://hungry-games-dance.loca.lt/)
 
 </div>
 
