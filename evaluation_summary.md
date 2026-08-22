@@ -92,7 +92,7 @@ The RAG system passed the functional multilingual smoke test: **15/15 known-answ
 
 ## References
 
-[1]: https://ansh123456789-ragingoa.hf.space/ "Hacker House Goa 2026 — Voice-Enabled Multilingual RAG public endpoint"
+[1]: https://hungry-games-dance.loca.lt/ "VECTOR — Voice-Enabled Multilingual RAG public endpoint"
 
 ## Attached Evaluation Artifacts
 

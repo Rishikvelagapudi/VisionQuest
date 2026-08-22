@@ -447,10 +447,10 @@ VECTOR/
 
 ---
 
-## 🚀 Hugging Face Space Deployment
+## 🚀 Deployment & Live Endpoints
 
-Deployed via **Docker SDK** on Hugging Face Spaces:
-- **Live Space URL**: [https://ansh123456789-ragingoa.hf.space](https://ansh123456789-ragingoa.hf.space)
+- **Live Deployed Application**: [https://hungry-games-dance.loca.lt](https://hungry-games-dance.loca.lt)
+- **Hugging Face Space**: [https://huggingface.co/spaces/rishik1111/visionquest](https://huggingface.co/spaces/rishik1111/visionquest)
 
 > [!TIP]
 > Free `cpu-basic` Spaces sleep after 48h inactivity. Initial container spin-up takes **30–90s**. Warm runtime operates at **~7–16 ms**.
