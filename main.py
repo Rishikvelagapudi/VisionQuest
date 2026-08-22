@@ -128,6 +128,15 @@ async def serve_cap() -> FileResponse:
     raise HTTPException(status_code=404, detail="Captain America image missing")
 
 
+@app.get("/spider_gwen.png")
+async def serve_spider_gwen() -> FileResponse:
+    """Serve Spider-Gwen sprite image."""
+    img_path = config.BASE_DIR / "web_ui" / "spider_gwen.png"
+    if img_path.exists():
+        return FileResponse(img_path)
+    raise HTTPException(status_code=404, detail="Spider-Gwen image missing")
+
+
 @app.get("/health", response_class=JSONResponse)
 async def health_check() -> Dict[str, Any]:
     """Health check reporting system and index readiness."""
