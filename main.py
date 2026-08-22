@@ -243,7 +243,12 @@ app = gr.mount_gradio_app(app, demo, path="/gradio")
 
 
 if __name__ == "__main__":
+    import sys
     port = int(os.getenv("PORT", "7860"))
     host = os.getenv("HOST", "0.0.0.0")
-    print(f"[Space Startup] Starting VECTOR Command Center UI on http://{host}:{port}")
-    uvicorn.run(app, host=host, port=port)
+    share = "--share" in sys.argv or os.getenv("SHARE", "false").lower() == "true"
+    print(f"[Space Startup] Starting VECTOR Command Center UI on http://{host}:{port} (share={share})")
+    if share:
+        demo.launch(server_name=host, server_port=port, share=True)
+    else:
+        uvicorn.run(app, host=host, port=port)
