@@ -88,7 +88,13 @@ app.add_middleware(
 # Preload models and perform full pipeline warmup asynchronously at startup
 @app.on_event("startup")
 async def startup_event():
-    print("[Space Startup] Server process started cleanly. Listening for connections...")
+    async def run_warmup():
+        print("[Space Startup] Preloading embedding model, FAISS indexes, and warming up pipeline...")
+        orchestrator = get_orchestrator()
+        await asyncio.to_thread(orchestrator.warmup_pipeline)
+        print("[Space Startup] Full RAG pipeline preloaded and warmed up successfully.")
+    
+    asyncio.create_task(run_warmup())
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -126,15 +132,6 @@ async def serve_cap() -> FileResponse:
     if img_path.exists():
         return FileResponse(img_path)
     raise HTTPException(status_code=404, detail="Captain America image missing")
-
-
-@app.get("/spider_gwen.png")
-async def serve_spider_gwen() -> FileResponse:
-    """Serve Spider-Gwen sprite image."""
-    img_path = config.BASE_DIR / "web_ui" / "spider_gwen.png"
-    if img_path.exists():
-        return FileResponse(img_path)
-    raise HTTPException(status_code=404, detail="Spider-Gwen image missing")
 
 
 @app.get("/health", response_class=JSONResponse)
@@ -243,12 +240,7 @@ app = gr.mount_gradio_app(app, demo, path="/gradio")
 
 
 if __name__ == "__main__":
-    import sys
     port = int(os.getenv("PORT", "7860"))
     host = os.getenv("HOST", "0.0.0.0")
-    share = "--share" in sys.argv or os.getenv("SHARE", "false").lower() == "true"
-    print(f"[Space Startup] Starting VECTOR Command Center UI on http://{host}:{port} (share={share})")
-    if share:
-        demo.launch(server_name=host, server_port=port, share=True)
-    else:
-        uvicorn.run(app, host=host, port=port)
+    print(f"[Space Startup] Starting VECTOR Command Center UI on http://{host}:{port}")
+    uvicorn.run(app, host=host, port=port)

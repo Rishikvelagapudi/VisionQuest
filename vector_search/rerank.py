@@ -4,7 +4,9 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List
 import numpy as np
+import torch
 from rank_bm25 import BM25Okapi
+from sentence_transformers.cross_encoder import CrossEncoder
 import config
 
 logger = logging.getLogger(__name__)
@@ -178,7 +180,6 @@ class PyTorchCrossEncoderRanker:
     PyTorch fallback wrapper for sentence-transformers CrossEncoder.
     """
     def __init__(self, model_name: str = config.CROSS_ENCODER_MODEL_NAME):
-        from sentence_transformers.cross_encoder import CrossEncoder
         load_path = model_name
         local_cache = getattr(config, "CROSS_ENCODER_LOCAL_CACHE", None)
         if local_cache and Path(local_cache).exists():
