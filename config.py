@@ -12,10 +12,13 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Limit background thread creation to preserve Windows system resources
+# Limit background thread creation & RAM consumption for cloud containers
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["OMP_NUM_THREADS"] = "2"
-os.environ["MKL_NUM_THREADS"] = "2"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
 
 # Load environment variables
 load_dotenv()
