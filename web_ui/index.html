@@ -945,6 +945,14 @@
     });
     searchBtn.addEventListener("click", executeSearch);
 
+    function getApiUrl(path) {
+      const origin = window.location.origin;
+      if (origin.includes("streamlit.app") || origin.includes("localhost:8501")) {
+        return "https://visionquest-production-0621.up.railway.app" + path;
+      }
+      return path;
+    }
+
     async function executeSearch() {
       const text = queryInput.value.trim();
       if (!text) return;
@@ -963,7 +971,7 @@
       fieldNoteText.textContent = `"${text}"`;
 
       try {
-        const response = await fetch("/query", { method: "POST", body: formData });
+        const response = await fetch(getApiUrl("/query"), { method: "POST", body: formData });
         if (!response.ok) {
           const errText = await response.text();
           let msg = response.statusText || ("HTTP " + response.status);
@@ -1040,7 +1048,7 @@
       formData.append("cross_lingual", isCrossLingual ? "true" : "false");
 
       try {
-        const response = await fetch("/query", { method: "POST", body: formData });
+        const response = await fetch(getApiUrl("/query"), { method: "POST", body: formData });
         if (!response.ok) {
           const errText = await response.text();
           let msg = response.statusText || ("HTTP " + response.status);
