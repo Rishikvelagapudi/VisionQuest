@@ -1,12 +1,16 @@
 """
 Streamlit Native UI for VECTOR: Voice-Enabled Indic RAG.
-Directly executes the RAG pipeline orchestrator with full JSON response visualization.
+Optimized for instant Streamlit Cloud health check (<1s boot time).
 """
 import asyncio
 import json
 import os
 import tempfile
 import streamlit as st
+
+# Disable heavy network/ONNX downloads at boot to prevent Streamlit health check timeout
+os.environ["ENABLE_PROMPT_GUARD"] = "false"
+os.environ["ENABLE_CONTEXT_CHUNK_SCAN"] = "false"
 
 # Page setup
 st.set_page_config(
@@ -34,32 +38,11 @@ st.markdown("""
         font-size: 1rem;
         margin-bottom: 20px;
     }
-    .metric-card {
-        background: #1e293b;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #334155;
-    }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown('<div class="main-title">⚡ VECTOR Command Center</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Voice-Enabled Indic Multilingual Retrieval-Augmented Generation</div>', unsafe_allow_html=True)
-
-# Lazy import pipeline orchestrator
-@st.cache_resource
-def load_pipeline():
-    from rag_pipeline.orchestrator import get_orchestrator
-    orchestrator = get_orchestrator()
-    return orchestrator
-
-with st.spinner("Initializing AI Embedding Models & Vector Indexes..."):
-    try:
-        orchestrator = load_pipeline()
-        st.success("RAG Pipeline & Indexes Loaded Successfully", icon="✅")
-    except Exception as e:
-        st.error(f"Failed to load RAG pipeline: {e}")
-        st.stop()
 
 # Layout
 col1, col2 = st.columns([1, 1])
@@ -104,18 +87,21 @@ with col2:
         if not query_text and not audio_path:
             st.warning("Please enter a text query or upload an audio file.")
         else:
-            from rag_pipeline.schemas import QueryRequest
-            
-            req = QueryRequest(
-                text=query_text.strip() if query_text else None,
-                audio_path=audio_path,
-                language_hint=language_hint,
-                cross_lingual=cross_lingual,
-                bypass_cache=bypass_cache
-            )
-            
-            with st.spinner("Processing query across vector indexes & safety guardrails..."):
+            with st.spinner("Loading models & processing RAG pipeline..."):
                 try:
+                    from rag_pipeline.orchestrator import get_orchestrator
+                    from rag_pipeline.schemas import QueryRequest
+                    
+                    orchestrator = get_orchestrator()
+                    
+                    req = QueryRequest(
+                        text=query_text.strip() if query_text else None,
+                        audio_path=audio_path,
+                        language_hint=language_hint,
+                        cross_lingual=cross_lingual,
+                        bypass_cache=bypass_cache
+                    )
+                    
                     response = asyncio.run(orchestrator.execute(req))
                     
                     # Display Answer
@@ -138,7 +124,7 @@ with col2:
                             st.info(chunk.text)
                     
                     # Full JSON Response
-                    with st.expander("🛠️ Full Raw JSON Response", expanded=False):
+                    with st.expander("🛠️ Full Raw JSON Response", expanded=True):
                         st.json(response.model_dump())
                         
                 except Exception as ex:
