@@ -1,137 +1,91 @@
 """
-Streamlit Native UI for VECTOR: Voice-Enabled Indic RAG.
-Optimized for instant Streamlit Cloud health check (<1s boot time).
+Streamlit App to render the full retro-tropical Command Center UI (web_ui/index.html)
+with base64 embedded assets and backend FastAPI support.
 """
-import asyncio
-import json
+import base64
+from pathlib import Path
+import threading
 import os
-import tempfile
+import uvicorn
 import streamlit as st
+import streamlit.components.v1 as components
 
-# Disable heavy network/ONNX downloads at boot to prevent Streamlit health check timeout
-os.environ["ENABLE_PROMPT_GUARD"] = "false"
-os.environ["ENABLE_CONTEXT_CHUNK_SCAN"] = "false"
-
-# Page setup
+# Streamlit Page Config
 st.set_page_config(
-    page_title="⚡ VECTOR — Voice Indic RAG",
+    page_title="⚡ VECTOR 2026 — Voice Indic RAG Engine",
     page_icon="⚡",
     layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# Custom retro-tropical styling
+# Hide Streamlit header/footer padding for full-screen UI experience
 st.markdown("""
 <style>
-    .stApp {
-        background-color: #0b0f19;
-        color: #e2e8f0;
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    .block-container {
+        padding-top: 0rem;
+        padding-bottom: 0rem;
+        padding-left: 0rem;
+        padding-right: 0rem;
+        max-width: 100%;
     }
-    .main-title {
-        font-family: monospace;
-        font-size: 2.2rem;
-        font-weight: bold;
-        color: #38bdf8;
-        text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-    }
-    .sub-title {
-        color: #94a3b8;
-        font-size: 1rem;
-        margin-bottom: 20px;
+    iframe {
+        border: none !important;
+        width: 100% !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">⚡ VECTOR Command Center</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Voice-Enabled Indic Multilingual Retrieval-Augmented Generation</div>', unsafe_allow_html=True)
+# Helper to read file as base64
+def get_base64_image(file_path: Path) -> str:
+    if file_path.exists():
+        with open(file_path, "rb") as f:
+            return f"data:image/png;base64,{base64.b64encode(f.read()).decode('utf-8')}"
+    return ""
 
-# Layout
-col1, col2 = st.columns([1, 1])
+# Load and prepare full HTML string
+@st.cache_data
+def get_prepared_html() -> str:
+    web_ui_dir = Path(__file__).parent / "web_ui"
+    index_file = web_ui_dir / "index.html"
+    
+    if not index_file.exists():
+        return "<h1>Error: web_ui/index.html not found</h1>"
+        
+    with open(index_file, "r", encoding="utf-8") as f:
+        html = f.read()
+        
+    # Replace relative PNG images with inline base64
+    for img_name in ["ironman.png", "thor.png", "cap.png", "spider_gwen.png", "spider_gwen_clean.png", "spider_gwen_cutout.png", "bg_beach.png"]:
+        b64_data = get_base64_image(web_ui_dir / img_name)
+        if b64_data:
+            html = html.replace(f'"{img_name}"', f'"{b64_data}"')
+            html = html.replace(f"'{img_name}'", f"'{b64_data}'")
+            html = html.replace(f'src="/{img_name}"', f'src="{b64_data}"')
+            
+    return html
 
-with col1:
-    st.subheader("🔍 Query Input")
-    
-    input_mode = st.radio("Select Input Mode", ["Text Query", "Audio File Upload"], horizontal=True)
-    
-    language_hint = st.selectbox(
-        "Language Hint",
-        options=["auto", "en", "hi", "mr"],
-        format_func=lambda x: {"auto": "Auto-Detect", "en": "English (en)", "hi": "Hindi (hi)", "mr": "Marathi (mr)"}[x]
-    )
-    
-    cross_lingual = st.checkbox("Enable Cross-Lingual Vector Search", value=False)
-    bypass_cache = st.checkbox("Bypass Semantic Answer Cache", value=False)
-    
-    query_text = ""
-    audio_path = None
-    
-    if input_mode == "Text Query":
-        query_text = st.text_area(
-            "Enter your question:",
-            placeholder="e.g., What are the key features of the Manhattan Project?",
-            height=120
-        )
-    else:
-        uploaded_audio = st.file_uploader("Upload Audio File (.wav, .mp3, .m4a)", type=["wav", "mp3", "m4a"])
-        if uploaded_audio:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp:
-                tmp.write(uploaded_audio.read())
-                audio_path = tmp.name
-            st.audio(uploaded_audio)
+# Start background FastAPI server for /query, /languages, /health endpoints
+@st.cache_resource
+def start_fastapi_backend():
+    def _run():
+        import main
+        # Disable heavy startup preloads in background thread
+        os.environ["ENABLE_PROMPT_GUARD"] = "false"
+        uvicorn.run(main.app, host="0.0.0.0", port=7860, log_level="warning")
+        
+    thread = threading.Thread(target=_run, daemon=True)
+    thread.start()
+    return True
 
-    submit_btn = st.button("🚀 Run RAG Pipeline", type="primary", use_container_width=True)
+# Initialize backend
+try:
+    start_fastapi_backend()
+except Exception:
+    pass
 
-with col2:
-    st.subheader("📊 Output & JSON Telemetry")
-    
-    if submit_btn:
-        if not query_text and not audio_path:
-            st.warning("Please enter a text query or upload an audio file.")
-        else:
-            with st.spinner("Loading models & processing RAG pipeline..."):
-                try:
-                    from rag_pipeline.orchestrator import get_orchestrator
-                    from rag_pipeline.schemas import QueryRequest
-                    
-                    orchestrator = get_orchestrator()
-                    
-                    req = QueryRequest(
-                        text=query_text.strip() if query_text else None,
-                        audio_path=audio_path,
-                        language_hint=language_hint,
-                        cross_lingual=cross_lingual,
-                        bypass_cache=bypass_cache
-                    )
-                    
-                    response = asyncio.run(orchestrator.execute(req))
-                    
-                    # Display Answer
-                    st.markdown("### 💬 Answer")
-                    if response.answer_source == "declined":
-                        st.error(response.answer)
-                    else:
-                        st.success(response.answer)
-                    
-                    # Telemetry Metrics
-                    m1, m2, m3 = st.columns(3)
-                    m1.metric("Target Language", response.language_detected.upper())
-                    m2.metric("Answer Source", response.answer_source)
-                    m3.metric("Total Latency", f"{response.total_ms:.1f} ms")
-                    
-                    # Retrieved Chunks
-                    with st.expander("📚 Retrieved Knowledge Chunks", expanded=True):
-                        for i, chunk in enumerate(response.retrieved_chunks):
-                            st.markdown(f"**Chunk #{i+1}** `[{chunk.source_lang.upper()}]` (Score: `{chunk.final_score:.4f}`)")
-                            st.info(chunk.text)
-                    
-                    # Full JSON Response
-                    with st.expander("🛠️ Full Raw JSON Response", expanded=True):
-                        st.json(response.model_dump())
-                        
-                except Exception as ex:
-                    st.error(f"Error executing pipeline: {ex}")
-                finally:
-                    if audio_path and os.path.exists(audio_path):
-                        try:
-                            os.remove(audio_path)
-                        except Exception:
-                            pass
+# Render Full Command Center UI
+prepared_html = get_prepared_html()
+components.html(prepared_html, height=1200, scrolling=True)
