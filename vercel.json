@@ -5,15 +5,15 @@
   "rewrites": [
     {
       "source": "/query",
-      "destination": "https://visionquest-hkzg.onrender.com/query"
+      "destination": "https://rishik1111-vector-backend.hf.space/query"
     },
     {
       "source": "/languages",
-      "destination": "https://visionquest-hkzg.onrender.com/languages"
+      "destination": "https://rishik1111-vector-backend.hf.space/languages"
     },
     {
       "source": "/health",
-      "destination": "https://visionquest-hkzg.onrender.com/health"
+      "destination": "https://rishik1111-vector-backend.hf.space/health"
     }
   ]
 }
