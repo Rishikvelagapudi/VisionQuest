@@ -1,0 +1,19 @@
+# Ignore backend files so Vercel only deploys static web_ui
+*.py
+*.onnx
+*.faiss
+*.ipynb
+api_endpoints/
+doc_chunking/
+knowledge_base/
+latency_benchmarks/
+llm_synthesis/
+model_training/
+rag_pipeline/
+rag_service/
+safety_guardrails/
+tests/
+vector_search/
+voice_stt/
+requirements.txt
+Dockerfile

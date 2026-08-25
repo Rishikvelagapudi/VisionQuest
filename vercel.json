@@ -1,22 +1,19 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "routes": [
+  "outputDirectory": "web_ui",
+  "rewrites": [
     {
-      "src": "/query",
-      "dest": "https://visionquest-hkzg.onrender.com/query"
+      "source": "/query",
+      "destination": "https://visionquest-hkzg.onrender.com/query"
     },
     {
-      "src": "/languages",
-      "dest": "https://visionquest-hkzg.onrender.com/languages"
+      "source": "/languages",
+      "destination": "https://visionquest-hkzg.onrender.com/languages"
     },
     {
-      "src": "/health",
-      "dest": "https://visionquest-hkzg.onrender.com/health"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/web_ui/$1"
+      "source": "/health",
+      "destination": "https://visionquest-hkzg.onrender.com/health"
     }
   ]
 }
