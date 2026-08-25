@@ -139,7 +139,7 @@ async def health_check() -> Dict[str, Any]:
     """Health check reporting system and index readiness."""
     index_mgr = get_index_manager()
     index_stats = {
-        name: idx.index.ntotal for name, idx in index_mgr.indexes.items()
+        name: idx.index.ntotal if hasattr(idx, "index") and idx.index else "qdrant_cloud" for name, idx in index_mgr.indexes.items()
     }
     return {
         "status": "healthy",

@@ -945,6 +945,17 @@
     });
     searchBtn.addEventListener("click", executeSearch);
 
+    function getApiUrl(path) {
+      if (window.API_BASE_URL) {
+        return window.API_BASE_URL.replace(/\/+$/, "") + path;
+      }
+      const stored = localStorage.getItem("VECTOR_API_URL");
+      if (stored) {
+        return stored.replace(/\/+$/, "") + path;
+      }
+      return path;
+    }
+
     async function executeSearch() {
       const text = queryInput.value.trim();
       if (!text) return;
@@ -963,7 +974,7 @@
       fieldNoteText.textContent = `"${text}"`;
 
       try {
-        const response = await fetch("/query", { method: "POST", body: formData });
+        const response = await fetch(getApiUrl("/query"), { method: "POST", body: formData });
         if (!response.ok) {
           const errText = await response.text();
           let msg = response.statusText || ("HTTP " + response.status);
@@ -1040,7 +1051,7 @@
       formData.append("cross_lingual", isCrossLingual ? "true" : "false");
 
       try {
-        const response = await fetch("/query", { method: "POST", body: formData });
+        const response = await fetch(getApiUrl("/query"), { method: "POST", body: formData });
         if (!response.ok) {
           const errText = await response.text();
           let msg = response.statusText || ("HTTP " + response.status);

@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/query",
+      "dest": "https://hungry-games-dance.loca.lt/query"
+    },
+    {
+      "src": "/languages",
+      "dest": "https://hungry-games-dance.loca.lt/languages"
+    },
+    {
+      "src": "/health",
+      "dest": "https://hungry-games-dance.loca.lt/health"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/web_ui/$1"
+    }
+  ]
+}
