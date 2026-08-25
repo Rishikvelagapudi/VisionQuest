@@ -4,15 +4,15 @@
   "routes": [
     {
       "src": "/query",
-      "dest": "https://hungry-games-dance.loca.lt/query"
+      "dest": "https://visionquest-hkzg.onrender.com/query"
     },
     {
       "src": "/languages",
-      "dest": "https://hungry-games-dance.loca.lt/languages"
+      "dest": "https://visionquest-hkzg.onrender.com/languages"
     },
     {
       "src": "/health",
-      "dest": "https://hungry-games-dance.loca.lt/health"
+      "dest": "https://visionquest-hkzg.onrender.com/health"
     },
     {
       "src": "/(.*)",
