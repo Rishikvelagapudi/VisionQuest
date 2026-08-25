@@ -1460,7 +1460,8 @@
     resizeMainCanvas();
 
     const mainIronmanImg = new Image();
-    mainIronmanImg.src = "/ironman.png";
+    mainIronmanImg.onerror = () => { if (!mainIronmanImg.src.endsWith("ironman.png")) mainIronmanImg.src = "ironman.png"; };
+    mainIronmanImg.src = "ironman.png";
     let mainIronmanLoaded = false;
     mainIronmanImg.onload = () => { mainIronmanLoaded = true; };
 
@@ -1795,7 +1796,8 @@
 
     // Captain America Sprite Loader
     const capImg = new Image();
-    capImg.src = "/cap.png";
+    capImg.onerror = () => { if (!capImg.src.endsWith("cap.png")) capImg.src = "cap.png"; };
+    capImg.src = "cap.png";
     let capLoaded = false;
     capImg.onload = () => { capLoaded = true; };
 
@@ -1804,7 +1806,8 @@
 
     // Thor Sprite & Lightning Helper
     const thorImg = new Image();
-    thorImg.src = "/thor.png";
+    thorImg.onerror = () => { if (!thorImg.src.endsWith("thor.png")) thorImg.src = "thor.png"; };
+    thorImg.src = "thor.png";
     let thorLoaded = false;
     thorImg.onload = () => { thorLoaded = true; };
 
