@@ -5,15 +5,15 @@
   "rewrites": [
     {
       "source": "/query",
-      "destination": "https://rishik1111-vector-backend.hf.space/query"
+      "destination": "https://hungry-games-dance.loca.lt/query"
     },
     {
       "source": "/languages",
-      "destination": "https://rishik1111-vector-backend.hf.space/languages"
+      "destination": "https://hungry-games-dance.loca.lt/languages"
     },
     {
       "source": "/health",
-      "destination": "https://rishik1111-vector-backend.hf.space/health"
+      "destination": "https://hungry-games-dance.loca.lt/health"
     }
   ]
 }
