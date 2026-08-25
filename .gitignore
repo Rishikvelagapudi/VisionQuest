@@ -48,6 +48,9 @@ data/indexes/*.log
 *.key
 *.pem
 
+# Scratch & temporary
+scratch/
+
 # IDE & OS
 .vscode/
 .idea/

@@ -26,5 +26,3 @@ soundfile>=0.12.1
 pytest>=7.4.0
 tqdm>=4.66.0
 psutil>=5.9.0
-streamlit>=1.30.0
-
