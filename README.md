@@ -394,19 +394,6 @@ python data/build_all_15_corpora.py
 
 ---
 
-### 6. 🐳 Docker Containerization & HF Spaces Deployment
-
-Build and run VECTOR inside a self-contained Docker container:
-```bash
-# Build Docker image
-docker build -t vector-rag .
-
-# Run container locally on port 7860
-docker run -p 7860:7860 --env-file .env vector-rag
-```
-
----
-
 ## 🧪 Test Suite & Verification (50/50 Passing)
 
 Run the full automated test suite:
