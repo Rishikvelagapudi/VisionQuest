@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: vector-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    plan: free
+    envVars:
+      - key: VECTOR_STORE_BACKEND
+        value: qdrant
+      - key: ENABLE_PROMPT_GUARD
+        value: "false"
+      - key: ALLOW_NETWORK_CALLS_IN_PIPELINE
+        value: "true"
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false
