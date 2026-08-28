@@ -11,6 +11,8 @@ services:
         value: qdrant
       - key: ENABLE_PROMPT_GUARD
         value: "false"
+      - key: SKIP_WARMUP
+        value: "true"
       - key: ALLOW_NETWORK_CALLS_IN_PIPELINE
         value: "true"
       - key: SARVAM_API_KEY
